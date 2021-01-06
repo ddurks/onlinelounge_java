@@ -1,5 +1,6 @@
-package com.drawvid.onlinelounge;
+package com.drawvid.onlinelounge.config;
 
+import com.drawvid.onlinelounge.handler.CustomHandshakeHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -18,7 +19,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/gs-guide-websocket").withSockJS();
+		registry.addEndpoint("/lounge").setHandshakeHandler(new CustomHandshakeHandler());
 	}
-
 }
