@@ -9,9 +9,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.tiledreader.FileSystemTiledReader;
+import org.tiledreader.TiledMap;
+import org.tiledreader.TiledReader;
+import org.tiledreader.TiledTileset;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +30,7 @@ public class GameService {
     private boolean running = false;
 
     ObjectMapper mapper = new ObjectMapper();
+    TiledReader reader = new FileSystemTiledReader();
 
     public GameService(SimpMessagingTemplate simpMessagingTemplate) {
         this.users = new HashMap<>();
@@ -45,7 +51,17 @@ public class GameService {
         if (this.joinable()) {
             this.addPlayer(user);
             if (!this.isRunning()) {
-                this.run();
+                //this.run();
+
+                // TiledLoader Testing :)
+//                URL path = this.getClass().getClassLoader().getResource("static/assets/tiles/onlinepluto-tilemap-new.tmx");
+//                TiledMap tiledMap = reader.getMap(path.getPath());
+//                List<TiledTileset> tileSets = tiledMap.getTilesets();
+//                System.out.println((tiledMap.getWidth() + ", " + tiledMap.getHeight() + " " + tiledMap.getTileWidth()));
+//                tileSets.forEach((tileset) -> {
+//                    System.out.println(tileset.getName());
+//                    System.out.println((tileset.getWidth() + ", " + tileset.getHeight() + " " + tileset.getTileWidth()));
+//                });
             }
             return true;
         }
@@ -61,7 +77,7 @@ public class GameService {
         String response = "";
         try {
             List<String> keyStateList = this.mapper.readValue(keyState, ArrayList.class);
-            System.out.println(keyStateList);
+            // System.out.println(keyStateList);
             response = this.mapper.writeValueAsString(this.lounge.getPlayers());
         } catch (IOException e) {
             e.printStackTrace();

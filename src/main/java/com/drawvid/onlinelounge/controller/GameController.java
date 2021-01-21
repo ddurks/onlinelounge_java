@@ -39,7 +39,7 @@ public class GameController {
 	@MessageMapping("/update/player")
 	@SendTo(Topic.STATE)
 	public String updateplayer(String keyState, ConnectedUser user) throws Exception {
-		System.out.println(user.getUsername() + keyState);
+		//System.out.println(user.getUsername() + keyState);
 		return gameService.updatePlayer(user, keyState);
 	}
 }
