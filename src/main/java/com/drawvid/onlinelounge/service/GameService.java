@@ -1,8 +1,9 @@
 package com.drawvid.onlinelounge.service;
 
-import com.drawvid.onlinelounge.model.util.ConnectedUser;
 import com.drawvid.onlinelounge.model.game.Lounge;
 import com.drawvid.onlinelounge.model.game.Player;
+import com.drawvid.onlinelounge.model.message.PlayerUpdateMessage;
+import com.drawvid.onlinelounge.model.util.ConnectedUser;
 import com.drawvid.onlinelounge.model.util.enums.Topic;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -10,14 +11,13 @@ import lombok.Setter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.tiledreader.FileSystemTiledReader;
-import org.tiledreader.TiledMap;
 import org.tiledreader.TiledReader;
-import org.tiledreader.TiledTileset;
 
 import java.awt.geom.Point2D;
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,8 +51,7 @@ public class GameService {
         if (this.joinable()) {
             this.addPlayer(user);
             if (!this.isRunning()) {
-                //this.run();
-
+                this.run();
                 // TiledLoader Testing :)
 //                URL path = this.getClass().getClassLoader().getResource("static/assets/tiles/onlinepluto-tilemap-new.tmx");
 //                TiledMap tiledMap = reader.getMap(path.getPath());
@@ -72,17 +71,22 @@ public class GameService {
         simpMessagingTemplate.convertAndSendToUser(user.getName(), topicString, "Hello " + user.getUsername() + " at " + new Date().toString());
     }
 
-    public String updatePlayer(ConnectedUser user, String keyState) {
+    public void messageAllUsers(String topicString, String payload) {
+        simpMessagingTemplate.convertAndSend(topicString, payload);
+    }
+
+    public void updatePlayer(ConnectedUser user, String playerString) {
+        String userId = user.getName();
         Player player = this.lounge.getPlayers().get(user.getName());
-        String response = "";
-        try {
-            List<String> keyStateList = this.mapper.readValue(keyState, ArrayList.class);
-            // System.out.println(keyStateList);
-            response = this.mapper.writeValueAsString(this.lounge.getPlayers());
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(player != null) {
+            try {
+                PlayerUpdateMessage updateMessage = mapper.readValue(playerString, PlayerUpdateMessage.class);
+                player.setPosition(new Point2D.Double(updateMessage.getPosition().getX(), updateMessage.getPosition().getY()));
+                player.setVelocity(updateMessage.getVelocity());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        return response;
     }
 
     private void addPlayer(ConnectedUser user) {
@@ -123,13 +127,22 @@ public class GameService {
         this.checkBulletCollisions();
     }
 
+    public void broadcastGameState() {
+        try {
+            this.messageAllUsers(Topic.STATE, mapper.writeValueAsString(this.getLounge().getPlayers().values()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void run() {
         this.setRunning(true);
         long lastLoopTime = System.nanoTime();
         final int TARGET_FPS = 60;
         final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
         long lastFpsTime = 0;
-        int MESSAGE_INTERVAL = 1000000000;
+        int MESSAGE_INTERVAL = 1000000000 / 30;
+        long lastStateUpdate = System.nanoTime();
         while (true) {
             long now = System.nanoTime();
             long updateLength = now - lastLoopTime;
@@ -141,6 +154,10 @@ public class GameService {
                 lastFpsTime = 0;
             }
 
+            if (now - lastStateUpdate > MESSAGE_INTERVAL) {
+                this.broadcastGameState();
+                lastStateUpdate = System.nanoTime();
+            }
             //todo: update game state here
             //this.updateGameState(delta);
 

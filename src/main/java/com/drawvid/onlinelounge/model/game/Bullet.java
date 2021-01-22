@@ -10,13 +10,13 @@ import java.awt.geom.Point2D;
 public class Bullet {
     private String id;
     private Point2D position;
-    private Speed2D speed;
+    private Vector2D velocity;
     private String shotBy;
     private int size = 16;
     private boolean hit = false;
 
     public void update(double delta) {
-        this.position.setLocation(this.position.getX() + this.speed.getSpeedX() * delta,
-                this.position.getY() + this.speed.getSpeedY() * delta);
+        this.position.setLocation(this.position.getX() + this.velocity.getX() * delta,
+                this.position.getY() + this.velocity.getY() * delta);
     }
 }

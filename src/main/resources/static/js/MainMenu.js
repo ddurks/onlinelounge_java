@@ -41,7 +41,7 @@ class MainMenu extends Phaser.Scene {
                 var inputPassword = this.getChildByName('password');
     
                 //  Have they entered anything?
-                if (inputUsername.value !== '' && inputPassword.value !== '')
+                if (inputUsername.value !== '')
                 {
                     OL.username = inputUsername.value;
                     OL.password = inputPassword.value;
