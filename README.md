@@ -1,3 +1,3 @@
 # onlinelounge
 
-![hello world](src/main/resources/static/assets/tiles/online-pluto-tileset.PNG "Hello World")
+![just a taste](src/main/resources/static/assets/tiles/online-tileset-extruded.png "Hello World")
