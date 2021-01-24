@@ -76,13 +76,14 @@ public class GameService {
     }
 
     public void updatePlayer(ConnectedUser user, String playerString) {
-        String userId = user.getName();
+//        String userId = user.getName();
         Player player = this.lounge.getPlayers().get(user.getName());
         if(player != null) {
             try {
                 PlayerUpdateMessage updateMessage = mapper.readValue(playerString, PlayerUpdateMessage.class);
                 player.setPosition(new Point2D.Double(updateMessage.getPosition().getX(), updateMessage.getPosition().getY()));
                 player.setVelocity(updateMessage.getVelocity());
+                player.setMsg(updateMessage.getMsg());
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -18,6 +18,6 @@ public class Lounge {
     }
 
     public void spawnPlayer(String id, String username) {
-        this.players.put(id, new Player(new Point2D.Double(50, 50),username, new Vector2D(0.0, 0.0), id, 32, true));
+        this.players.put(id, new Player(new Point2D.Double(50, 50),username, new Vector2D(0.0, 0.0), id, "", 32, true));
     }
 }

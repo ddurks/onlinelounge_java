@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlayerUpdateMessage {
+    String msg;
     Vector2D position;
     Vector2D velocity;
 }

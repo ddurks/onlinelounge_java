@@ -132,6 +132,7 @@ class OnlineLounge extends Phaser.Scene {
           serverClient.sendMessage("/app/join", this.player.username);
           this.time.addEvent({ delay: 1000/30, callback: () => {
             serverClient.updatePlayer(JSON.stringify({
+                msg: this.player.msg,
                 position: {
                     x: this.player.x,
                     y: this.player.y
@@ -272,6 +273,7 @@ class OnlineLounge extends Phaser.Scene {
 
                 playerToUpdate.speakText.x = playerToUpdate.x;
                 playerToUpdate.speakText.y = playerToUpdate.y - 50;
+                playerToUpdate.speakText.setText(playerData.msg);
     
                 playerToUpdate.usernameText.x = playerToUpdate.x;
                 playerToUpdate.usernameText.y = playerToUpdate.y + 20;
