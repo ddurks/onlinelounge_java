@@ -27,7 +27,6 @@ class MainMenu extends Phaser.Scene {
 
         var element = this.add.dom(OL.world.width/2, OL.world.height/2).createFromCache('nameform');
 
-        console.log(element);
         element.setPerspective(800)
         element.addListener('click');
 

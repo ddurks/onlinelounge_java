@@ -74,9 +74,9 @@ class OnlineLounge extends Phaser.Scene {
         var groundTileset = map.addTilesetImage("online-pluto-tileset-extruded", "groundTiles");
         var objectTileset = map.addTilesetImage("online-tileset-extruded", "objectTiles");
         var belowLayer = map.createLayer("below", groundTileset, 0, 0);
-        var worldLayer = map.createLayer("world", objectTileset, 0, 0);
+        this.worldLayer = map.createLayer("world", objectTileset, 0, 0);
         var aboveLayer = map.createLayer("above", objectTileset, 0, 0);
-        worldLayer.setCollisionByProperty({ collides: true });
+        this.worldLayer.setCollisionByProperty({ collides: true });
         aboveLayer.setDepth(10);
 
         // player
@@ -94,7 +94,7 @@ class OnlineLounge extends Phaser.Scene {
 
         this.physics.world.enable([this.cuteGuy, this.player]);
 
-        this.physics.add.collider(this.player, worldLayer);
+        this.physics.add.collider(this.player, this.worldLayer);
 
         this.camera = this.cameras.main;
         this.camera.startFollow(this.player);
@@ -132,7 +132,10 @@ class OnlineLounge extends Phaser.Scene {
           serverClient.sendMessage("/app/join", this.player.username);
           this.time.addEvent({ delay: 1000/30, callback: () => {
             serverClient.updatePlayer(JSON.stringify({
-                position: this.player.body.position,
+                position: {
+                    x: this.player.x,
+                    y: this.player.y
+                },
                 velocity: this.player.body.velocity
                 }));
           }, callbackScope: this, loop: true });
@@ -241,12 +244,14 @@ class OnlineLounge extends Phaser.Scene {
         player.speakText = this.generateSpeakText(player);
 
         this.physics.world.enable(player);
+        this.physics.add.collider(player, this.worldLayer);
 
         return player;
     }
 
     generateUsernameText(player) {
         var usernameText = this.add.text(player.x,player.y + player.size + 10, player.username);
+        console.log(player.username);
         usernameText.setStroke('grey', 3);
         usernameText.setAlign('center');
         return usernameText;
@@ -269,7 +274,7 @@ class OnlineLounge extends Phaser.Scene {
                 playerToUpdate.speakText.y = playerToUpdate.y - 50;
     
                 playerToUpdate.usernameText.x = playerToUpdate.x;
-                playerToUpdate.usernameText.y = playerToUpdate + 20;
+                playerToUpdate.usernameText.y = playerToUpdate.y + 20;
             }
         });
     }
