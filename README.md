@@ -1,3 +1,3 @@
 # onlinelounge
 
-![just a taste](src/main/resources/static/assets/tiles/online-tileset-extruded.png "Hello World")
+![onlinebouncer.png](src/main/resources/static/assets/onlinebouncer.GIF
