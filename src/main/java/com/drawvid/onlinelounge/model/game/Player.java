@@ -14,6 +14,7 @@ public class Player {
     private String username;
     private Vector2D velocity;
     private String id;
+    private String msg;
     private int size = 32;
     private boolean alive = true;
 
