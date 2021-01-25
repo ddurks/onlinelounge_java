@@ -1,3 +1,3 @@
 # onlinelounge
 
-![onlinebouncer.png](src/main/resources/static/assets/onlinebouncer.GIF
+![onlinebouncer.png](src/main/resources/static/assets/onlinebouncer.GIF)
