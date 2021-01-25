@@ -6,11 +6,13 @@ import com.drawvid.onlinelounge.model.util.enums.Topic;
 import com.drawvid.onlinelounge.service.GameService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Controller
 public class GameController {
@@ -46,5 +48,16 @@ public class GameController {
 	public void updateplayer(String keyState, ConnectedUser user) throws Exception {
 		//System.out.println(user.getUsername() + keyState);
 		gameService.updatePlayer(user, keyState);
+	}
+
+	@EventListener
+	public void onDisconnectEvent(SessionDisconnectEvent event) {
+		try {
+			String userId = event.getUser().getName();
+			System.out.println(userId + " has disconnected");
+			this.gameService.leaveServer(userId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

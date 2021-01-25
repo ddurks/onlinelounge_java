@@ -116,7 +116,6 @@ class OnlineLounge extends Phaser.Scene {
     generateGameServerConnectionClient() {
         var serverClient = new GamServerClient();
         serverClient.connect(this.player.username, (result) => {
-          console.log(result.headers['user-name']);
           this.player.playerId = result.headers['user-name'];
           serverClient.stompClient.subscribe('/user/topic/access', (messageOutput) => {
             // TODO
@@ -133,6 +132,7 @@ class OnlineLounge extends Phaser.Scene {
           this.time.addEvent({ delay: 1000/30, callback: () => {
             serverClient.updatePlayer(JSON.stringify({
                 msg: this.player.msg,
+                typing: this.player.typing,
                 position: {
                     x: this.player.x,
                     y: this.player.y
@@ -173,15 +173,21 @@ class OnlineLounge extends Phaser.Scene {
         this.chatting = true;
         this.chatButton.setText(OL.SEND_TEXT);
         document.getElementById("chat-box").style.display = "block";
+        this.player.typingIcon.setActive(true).setVisible(true);
+        this.player.typing = true;
         this.input.keyboard.enabled = false;
     }
 
     sendChat() {
         this.chatting = false;
         this.setPlayerMsg(document.getElementById("chat-entry").value);
+        document.getElementById("chat-entry").value = "";
         this.player.speakText.setText(this.player.msg);
         this.chatButton.setText(OL.CHAT_TEXT);
+        this.player.typingIcon.setActive(false).setVisible(false);
+        this.player.typing = false;
         document.getElementById("chat-box").style.display = "none";
+
         this.input.keyboard.enabled = true;
     }
 
@@ -240,14 +246,32 @@ class OnlineLounge extends Phaser.Scene {
         player.size = 25;
         player.msg = "";
         player.msg_duration = 0;
+        player.typing = false;
 
         player.usernameText = this.generateUsernameText(player);
         player.speakText = this.generateSpeakText(player);
+        player.typingIcon = this.generateTypingIcon(player);
 
         this.physics.world.enable(player);
         this.physics.add.collider(player, this.worldLayer);
 
         return player;
+    }
+
+    generateTypingIcon(player) {
+        var typingIcon = this.add.sprite(player.x + player.size / 2, player.y - player.size, 'typingIcon');
+
+        typingIcon.anims.create({
+            key: 'typing', 
+            frameRate: 3,
+            frames: typingIcon.anims.generateFrameNumbers('typingIcon', { frames: [0, 1, 2, 3] }),
+            repeat: -1
+        });
+
+        typingIcon.anims.play('typing');
+        typingIcon.setActive(false).setVisible(false);
+
+        return typingIcon;
     }
 
     generateUsernameText(player) {
@@ -270,13 +294,16 @@ class OnlineLounge extends Phaser.Scene {
                 playerToUpdate.x = playerData.position.x;
                 playerToUpdate.y = playerData.position.y;
                 this.animForPlayerFromVelocity(playerToUpdate);
+                if (playerData.typing) {
+                    playerToUpdate.typingIcon.setActive(true).setVisible(true);
+                } else {
+                    if (playerToUpdate.typingIcon.active) {
+                        playerToUpdate.typingIcon.setActive(false).setVisible(false);
+                    }
+                    playerToUpdate.speakText.setText(playerData.msg);
+                }
 
-                playerToUpdate.speakText.x = playerToUpdate.x;
-                playerToUpdate.speakText.y = playerToUpdate.y - 50;
-                playerToUpdate.speakText.setText(playerData.msg);
-    
-                playerToUpdate.usernameText.x = playerToUpdate.x;
-                playerToUpdate.usernameText.y = playerToUpdate.y + 20;
+                this.updatePlayerStuff(playerToUpdate);
             }
         });
     }
@@ -303,13 +330,19 @@ class OnlineLounge extends Phaser.Scene {
                 this.playerMovementHandler();
             }
             this.playerMsgDecayHandler(delta);
-
-            this.player.speakText.x = this.player.x;
-            this.player.speakText.y = this.player.y - 50;
-
-            this.player.usernameText.x = this.player.x;
-            this.player.usernameText.y = this.player.y + 20;
+            this.updatePlayerStuff(this.player);
         }
+    }
+
+    updatePlayerStuff(player) {
+        player.speakText.x = player.x;
+        player.speakText.y = player.y - 50;
+
+        player.typingIcon.x = player.x + player.size /2;
+        player.typingIcon.y = player.y - player.size;
+
+        player.usernameText.x = player.x;
+        player.usernameText.y = player.y + 20;
     }
 
     playerMsgDecayHandler(delta) {

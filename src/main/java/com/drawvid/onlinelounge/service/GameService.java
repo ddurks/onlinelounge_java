@@ -51,7 +51,7 @@ public class GameService {
         if (this.joinable()) {
             this.addPlayer(user);
             if (!this.isRunning()) {
-                this.run();
+                this.startGameServer();
                 // TiledLoader Testing :)
 //                URL path = this.getClass().getClassLoader().getResource("static/assets/tiles/onlinepluto-tilemap-new.tmx");
 //                TiledMap tiledMap = reader.getMap(path.getPath());
@@ -65,6 +65,14 @@ public class GameService {
             return true;
         }
         return false;
+    }
+
+    public void leaveServer(String userId) {
+        Player leavingPlayer = this.getLounge().getPlayers().remove(userId);
+        if (this.getLounge().getPlayers().size() <= 0) {
+            this.suspendGameServer();
+        }
+        System.out.println(this.getLounge().getPlayers().size());
     }
 
     public void messageUser(ConnectedUser user, String topicString) {
@@ -84,6 +92,10 @@ public class GameService {
                 player.setPosition(new Point2D.Double(updateMessage.getPosition().getX(), updateMessage.getPosition().getY()));
                 player.setVelocity(updateMessage.getVelocity());
                 player.setMsg(updateMessage.getMsg());
+                if (updateMessage.isTyping()) {
+                    System.out.println(user.getUsername() + "is typing :)");
+                }
+                player.setTyping(updateMessage.isTyping());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -134,17 +146,22 @@ public class GameService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("Players: " + this.getLounge().getPlayers().size());
+    }
+
+    public void startGameServer() {
+        this.setRunning(true);
+        this.run();
     }
 
     public void run() {
-        this.setRunning(true);
         long lastLoopTime = System.nanoTime();
         final int TARGET_FPS = 60;
         final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
         long lastFpsTime = 0;
         int MESSAGE_INTERVAL = 1000000000 / 30;
         long lastStateUpdate = System.nanoTime();
-        while (true) {
+        while (this.isRunning()) {
             long now = System.nanoTime();
             long updateLength = now - lastLoopTime;
             lastLoopTime = now;
@@ -169,5 +186,9 @@ public class GameService {
             } catch (Exception e) {
             }
         }
+    }
+
+    public void suspendGameServer() {
+        this.setRunning(false);
     }
 }

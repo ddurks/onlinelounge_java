@@ -9,6 +9,7 @@ class Preloader extends Phaser.Scene {
 		this.load.html('nameform', 'loginform.html');
 		this.load.html('chatBox', 'chatbox.html');
 		this.load.spritesheet('playerDefault', 'assets/computerguy-spritesheet-extruded.png', { frameWidth: 26, frameHeight: 29, margin: 1, spacing: 2 });
+		this.load.spritesheet('typingIcon', 'assets/typing.png', { frameWidth: 16, frameHeight: 16, margin: 0, spacing: 0 });
 		this.load.image('cute', 'assets/pleading_eyes_emoji.png');
 		this.load.image('groundTiles', "assets/tiles/online-pluto-tileset-extruded.png");
 		this.load.image('objectTiles', "assets/tiles/online-tileset-extruded.png");
