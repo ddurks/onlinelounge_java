@@ -5,6 +5,9 @@ import { MainMenu } from './MainMenu';
 import { OnlineLounge } from './OnlineLounge';
 
 var gameConfig = {
+	roundPixels: true,
+	pixelArt: true,
+	antialias: false,
 	scale: {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH,

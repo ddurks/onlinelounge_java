@@ -6,6 +6,7 @@ export class OnlineLounge extends Phaser.Scene {
         super('OnlineLounge');
         this.chatting = false;
         this.players = new Map();
+        this.butterflies = new Array();
     }
 
     create() { 
@@ -37,7 +38,9 @@ export class OnlineLounge extends Phaser.Scene {
         this.physics.add.collider(this.player, this.worldLayer);
 
         this.camera = this.cameras.main;
-        this.camera.startFollow(this.player);
+
+        this.cameraDolly = new Phaser.Geom.Point(this.player.x, this.player.y);
+        this.camera.startFollow(this.player, true);
         this.camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
         // create chat button and chatbox
@@ -86,7 +89,15 @@ export class OnlineLounge extends Phaser.Scene {
 
     update(time, delta) {
         this.playerHandler(delta);
-        this.physics.world.collide(this.player, this.cuteGuy)
+        console.log(this.player.x, this.player.y)
+        this.physics.world.collide(this.player, this.cuteGuy);
+        let random = OL.getRandomInt(0, 50);
+        if (random === 25) {
+            console.log("generate butterfly");
+            this.generateButterfly();
+        }
+        this.cameraDolly.x = Math.floor(this.player.x);
+        this.cameraDolly.y = Math.floor(this.player.y);
     }
 
     chat() {
@@ -212,6 +223,28 @@ export class OnlineLounge extends Phaser.Scene {
         typingIcon.setActive(false).setVisible(false);
 
         return typingIcon;
+    }
+
+    generateButterfly() {
+        let butterfly = this.add.sprite(this.player.x + OL.getRandomInt(-250, 250), this.player.y + OL.getRandomInt(-250, 250), 'purpleButterfly');
+
+        butterfly.anims.create({
+            key: 'left', 
+            frameRate: 3,
+            frames: butterfly.anims.generateFrameNumbers('purpleButterfly', { frames: [0, 1] }),
+            repeat: -1
+        });
+
+        butterfly.anims.create({
+            key: 'right', 
+            frameRate: 3,
+            frames: butterfly.anims.generateFrameNumbers('purpleButterfly', { frames: [2, 3] }),
+            repeat: -1
+        });
+
+        butterfly.anims.play('left');
+        this.butterflies.push(butterfly);
+        return butterfly;
     }
 
     generateUsernameText(player) {
