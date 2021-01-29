@@ -13,7 +13,9 @@ class Preloader extends Phaser.Scene {
 		this.load.image('cute', 'assets/pleading_eyes_emoji.png');
 		this.load.image('groundTiles', "assets/tiles/online-pluto-tileset-extruded.png");
 		this.load.image('objectTiles', "assets/tiles/online-tileset-extruded.png");
+		this.load.image('groundTiles', "assets/tiles/online-lounge-objects-extruded.png");
 		this.load.tilemapTiledJSON('map', 'assets/tiles/onlinepluto-tilemap-new.json');
+		this.load.tilemapTiledJSON('map', 'assets/tiles/onlinelounge-tilemap.json');
 
 		// var progress = this.add.graphics();
 		// this.load.on('progress', function (value) {
