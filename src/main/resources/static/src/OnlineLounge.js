@@ -9,7 +9,6 @@ export class OnlineLounge extends Phaser.Scene {
         super('OnlineLounge');
         this.players = new Map();
         this.butterflies = new Array();
-        this.uiControls = new Controls(this);
     }
 
     create() { 
@@ -46,29 +45,11 @@ export class OnlineLounge extends Phaser.Scene {
         this.camera.startFollow(this.player, true);
         this.camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-        // create chat button and chatbox
-        // var chatIcon = this.add.image(460, 460, 'typingIcon', 0);
-        // var chatIcon = this.add.image(460, 475, 'chatIcon', 0);
-        // chatIcon.setScale(4);
-        // chatIcon.setDepth(11);
-        // chatIcon.setInteractive();
-        // chatIcon.on('pointerdown', this.chat, this);
-        // this.add.existing(chatIcon).setScrollFactor(0);
-        // this.chatButton = new TextButton(this, 425, 460, OL.CHAT_TEXT, { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.chat());
-        // this.chatButton.setDepth(11);
-        // this.add.existing(this.chatButton).setScrollFactor(0);
+        this.scene.get('Controls').events.on('openChat', () => this.openChatBox());
+        this.scene.get('Controls').events.on('sendChat', () => this.sendChat());
+        this.scene.get('Controls').events.on('zoomIn', () => this.zoomIn());
+        this.scene.get('Controls').events.on('zoomOut', () => this.zoomOut());
 
-        // this.add.dom(OL.world.width/2, OL.world.height/2).createFromCache('chatBox').setScrollFactor(0);
-        // document.getElementById("chat-box").style.display = "none";
-        // const MAX_LENGTH = 100;
-        // document.getElementById('chat-entry').onkeyup = function () {
-        //     console.log("chat entered");
-        //     document.getElementById('char-count').innerHTML = (this.value.length) + "/" + MAX_LENGTH;
-        // };
-
-        // this.zoomButton = new TextButton(this, 425, 10, "zoom", { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.zoomIn());
-        // this.zoomButton.setDepth(11);
-        // this.add.existing(this.zoomButton).setScrollFactor(0);
 
         console.log("welcome to the online lounge");
         console.log(OL.username, " (password: " + OL.password + ")");
@@ -113,39 +94,25 @@ export class OnlineLounge extends Phaser.Scene {
         this.cameraDolly.y = Math.floor(this.player.y);
     }
 
-    chat() {
-        if (this.chatButton.text === OL.CHAT_TEXT) {
-            this.openChatBox();
-        } else {
-            this.sendChat();
-        }
-    }
-
     zoomIn() {
+        console.log("zoom in");
         this.camera.pan(this.player.x, this.player.y, 100, 'Power2');
         this.camera.zoomTo(2, 2000);
-        this.zoomButton.x = this.zoomButton.x/4;
     }
 
     zoomOut() {
+        console.log("zoom out");
         this.camera.pan(this.player.x, this.player.y, 100, 'Power2');
         this.camera.zoomTo(1, 2000);    
     }
 
     openChatBox() {
-        this.chatButton.setText(OL.SEND_TEXT);
-        document.getElementById("chat-box").style.display = "block";
         this.player.startTyping();
-        var chatBox = document.getElementById("chat-entry");
-        chatBox.focus();
         this.input.keyboard.enabled = false;
     }
 
     sendChat() {
         this.player.setMsg(document.getElementById("chat-entry").value);
-        document.getElementById("chat-entry").value = "";
-        this.chatButton.setText(OL.CHAT_TEXT);
-        document.getElementById("chat-box").style.display = "none";
         this.input.keyboard.enabled = true;
     }
 
@@ -178,8 +145,12 @@ export class OnlineLounge extends Phaser.Scene {
             console.log("generate butterfly");
             this.generateButterfly();
         }
-        this.butterflies.forEach( (butterfly) => {
+        this.butterflies.forEach( (butterfly, index, butterflies) => {
             butterfly.update();
+            if (!this.camera.worldView.contains(butterfly.x,butterfly.y)) {
+                butterflies.splice(index, 1);
+                butterfly.destroy();
+            }
         })
     }
 

@@ -23,14 +23,8 @@ export class Preloader extends Phaser.Scene {
 		this.load.tilemapTiledJSON('map', 'assets/tiles/onlinepluto-tilemap-new.json');
 		this.load.tilemapTiledJSON('map', 'assets/tiles/onlinelounge-tilemap.json');
 
-		// var progress = this.add.graphics();
-		// this.load.on('progress', function (value) {
-		// 	progress.clear();
-		// 	progress.fillStyle(0xffde00, 1);
-		// 	progress.fillRect(loadingBg.x-(loadingBg.width*0.5)+20, loadingBg.y-(loadingBg.height*0.5)+10, 540 * value, 25);
-		// });
     }
     create() {
-		OL.fadeOutScene('MainMenu', this);
+		this.scene.start('MainMenu');
 	}
 }

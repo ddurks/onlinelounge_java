@@ -41,25 +41,20 @@ export class MainMenu extends Phaser.Scene {
                 var inputUsername = this.getChildByName('username');
                 var inputPassword = this.getChildByName('password');
     
-                //  Have they entered anything?
                 if (inputUsername.value !== '')
                 {
                     OL.username = inputUsername.value;
                     OL.password = inputPassword.value;
-                    //  Turn off the click events
                     this.removeListener('click');
     
-                    //  Tween the login form out
                     this.scene.tweens.add({ targets: element.rotate3d, x: 1, w: 90, duration: 3000, ease: 'Power3' });
     
                     this.scene.tweens.add({ targets: element, scaleX: 2, scaleY: 2, y: 700, duration: 3000, ease: 'Power3', onComplete: thisScene.clickStart(thisScene)});
     
-                    //  Populate the text with whatever they typed in as the username!
                     text.setText('Welcome ' + inputUsername.value);
                 }
                 else
                 {
-                    //  Flash the prompt
                     this.scene.tweens.add({ targets: text, alpha: 0.1, duration: 200, ease: 'Power3', yoyo: true });
                 }
             }
@@ -82,6 +77,7 @@ export class MainMenu extends Phaser.Scene {
     }
 
     clickStart(scene) {
-        OL.fadeOutScene('OnlineLounge', scene)
+        this.scene.start('Controls');
+        this.scene.start('OnlineLounge');
     }
 }

@@ -9,7 +9,8 @@
   "author": "drawvid",
   "license": "ISC",
   "dependencies": {
-    "phaser": "^3.52.0"
+    "phaser": "^3.52.0",
+    "update": "^0.7.4"
   },
   "devDependencies": {
     "webpack": "^5.18.0",

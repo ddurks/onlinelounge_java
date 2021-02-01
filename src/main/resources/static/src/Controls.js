@@ -1,8 +1,13 @@
+import { TextButton, OL } from "./utils";
+
 export class Controls extends Phaser.Scene {
     constructor(slaveScene) {
         super('Controls');
 
-        this.slave = slaveScene;
+        this.CHAT_TEXT = "chat";
+        this.SEND_TEXT = "send";
+        this.chatText = this.CHAT_TEXT;
+        this.zoomed = false;
     }
 
     create() {
@@ -13,10 +18,8 @@ export class Controls extends Phaser.Scene {
         var chatIcon = this.add.image(460, 475, 'chatIcon', 0);
         chatIcon.setScale(4);
         chatIcon.setDepth(11);
-        chatIcon.setInteractive();
-        chatIcon.on('pointerdown', this.chat, this);
         this.add.existing(chatIcon).setScrollFactor(0);
-        this.chatButton = new TextButton(this, 425, 460, OL.CHAT_TEXT, { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.slave.chat());
+        this.chatButton = new TextButton(this, 425, 460, OL.CHAT_TEXT, { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.chat());
         this.chatButton.setDepth(11);
         this.add.existing(this.chatButton).setScrollFactor(0);
 
@@ -28,8 +31,51 @@ export class Controls extends Phaser.Scene {
             document.getElementById('char-count').innerHTML = (this.value.length) + "/" + MAX_LENGTH;
         };
 
-        this.zoomButton = new TextButton(this, 425, 10, "zoom", { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.slave.zoomIn());
+        this.zoomButton = new TextButton(this, 425, 10, "zoom", { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.zoomIn());
         this.zoomButton.setDepth(11);
         this.add.existing(this.zoomButton).setScrollFactor(0);
+    }
+
+    chat() {
+        if (this.chatText === this.CHAT_TEXT) {
+            this.openChatBox();
+        } else {
+            this.sendChat();
+        }
+    }
+
+    openChatBox() {
+        this.chatText = this.SEND_TEXT;
+        this.events.emit('openChat');
+        this.chatButton.setText(this.SEND_TEXT);
+        document.getElementById("chat-box").style.display = "block";
+        var chatBox = document.getElementById("chat-entry");
+        chatBox.focus();
+    }
+
+    sendChat() {
+        this.chatText = this.CHAT_TEXT;
+        this.events.emit('sendChat');
+        document.getElementById("chat-entry").value = "";
+        this.chatButton.setText(OL.CHAT_TEXT);
+        document.getElementById("chat-box").style.display = "none";
+    }
+
+    zoom() {
+        if (!this.zoomed) {
+            this.zoomIn();
+        } else {
+            this.zoomOut();
+        }
+    }
+
+    zoomIn() {
+        this.zoomed = true;
+        this.events.emit('zoomIn');
+    }
+
+    zoomOut() {
+        this.zoomed = false;
+        this.events.emit('zoomOut');
     }
 }
