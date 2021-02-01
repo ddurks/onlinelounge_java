@@ -1,8 +1,8 @@
 export const OL = {
-    SERVER_URL: "ws://" + window.location.host.replace(/\d+$/, "8081"),
+    SERVER_URL: "ws://" + window.location.host.replace(/\d+$/, "9080"),
     username: "anonymous",
     password: "",
-    CHAT_TEXT: "chat",
+    CHAT_TEXT: " chat \n",
     SEND_TEXT: "send",
     MSG_MAXTIME: 10000,
     WALKING_FRAMERATE: 10,
@@ -53,7 +53,7 @@ export class TextButton extends Phaser.GameObjects.Text {
     }
 
     enterButtonHoverState() {
-      this.setStyle({ fill: 'white'});
+      this.setStyle({ fill: 'lightgrey'});
     }
 
     enterButtonRestState() {
@@ -61,7 +61,7 @@ export class TextButton extends Phaser.GameObjects.Text {
     }
 
     enterButtonActiveState() {
-      this.setStyle({ fill: 'white' });
+      this.setStyle({ fill: 'lightgrey' });
     }
 }
 
@@ -69,4 +69,17 @@ OL.getRandomInt= function(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+OL.getAngle = function(cx, cy, ex, ey) {
+  var dy = ey - cy;
+  var dx = ex - cx;
+  var theta = Math.atan2(dy, dx); // range (-PI, PI]
+  theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+  //if (theta < 0) theta = 360 + theta; // range [0, 360)
+  return theta;
+}
+
+OL.getDistance = function(x1, y1, x2, y2) {
+  return Math.sqrt(Math.pow(x1-x2, 2), Math.pow(y1-y2, 2));
 }

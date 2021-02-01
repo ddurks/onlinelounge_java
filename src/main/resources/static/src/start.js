@@ -3,12 +3,16 @@ import { Preloader } from './Preloader';
 import { Boot } from './Boot';
 import { MainMenu } from './MainMenu';
 import { OnlineLounge } from './OnlineLounge';
+import { Controls } from './Controls';
 
 var gameConfig = {
-	roundPixels: true,
-	pixelArt: true,
-	antialias: false,
+	render: {
+		roundPixels: true,
+		pixelArt: true,
+		antialias: false,
+	},
 	scale: {
+		parent: 'phaser-div',
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH,
 		width: 512,
@@ -24,7 +28,7 @@ var gameConfig = {
 			debug: false,
 		}
     },
-	scene: [Boot, Preloader, MainMenu, OnlineLounge]
+	scene: [Boot, Preloader, MainMenu, OnlineLounge, Controls]
 }
 var game = new Phaser.Game(gameConfig);
 window.focus();

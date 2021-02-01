@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>the online lounge</title>
     <style>
+        @font-face {
+            font-family: gaming1;
+            src: url('assets/fonts/8-bit-arcade-in.ttf');
+            font-weight:400;
+            font-weight:normal;
+        }
+        @font-face {
+            font-family: gaming2;
+            src: url('assets/fonts/early-gameboy.ttf');
+            font-weight:400;
+            font-weight:normal;
+        }
         html, body {margin: 0; height: 100%; overflow: hidden}
 
         body {
@@ -21,17 +33,19 @@
         .item {
             margin: 1rem;
         }
+
+        #phaser-div {
+            position: fixed;
+            top:0;
+        }
+
+        canvas {
+            margin-top: 0;
+        }
     </style>
-    <script type="text/javascript" src="src/lib/stomp.js"></script>
-    <!-- <script type="text/javascript" src="//cdn.jsdelivr.net/npm/phaser@3.51.0/dist/phaser.js"></script>
-    <script type="text/javascript" src="js/lib/stomp.js"></script>
-    <script type="text/javascript" src="js/utils.js"></script>
-    <script type="text/javascript" src="js/Boot.js"></script>
-    <script type="text/javascript" src="js/Preloader.js"></script>
-    <script type="text/javascript" src="js/MainMenu.js"></script>
-    <script type="text/javascript" src="js/OnlineLounge.js"></script> -->
 </head>
 <body>
+    <div style="font-family:gaming1; position:absolute; left:-1000px; visibility:hidden;">.</div>
     <div id="phaser-div"></div>
     <script src="app.bundle.js"></script>
     <!-- <script src="js/start.js"></script> -->

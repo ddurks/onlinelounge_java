@@ -1,12 +1,15 @@
 import { OL, TextButton } from './utils';
 import { GamServerClient } from './GameServerClient';
+import { Player } from './Player';
+import { Butterfly } from './Butterfly';
+import { Controls } from './Controls';
 
 export class OnlineLounge extends Phaser.Scene {
     constructor() {
         super('OnlineLounge');
-        this.chatting = false;
         this.players = new Map();
         this.butterflies = new Array();
+        this.uiControls = new Controls(this);
     }
 
     create() { 
@@ -44,12 +47,28 @@ export class OnlineLounge extends Phaser.Scene {
         this.camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
         // create chat button and chatbox
-        this.chatButton = new TextButton(this, 450, 475, OL.CHAT_TEXT, { fill: 'black', shadowColor: 'grey', backgroundColor: 'darkgrey' }, () => this.chat());
-        this.chatButton.setDepth(11);
-        this.add.existing(this.chatButton).setScrollFactor(0);
+        // var chatIcon = this.add.image(460, 460, 'typingIcon', 0);
+        // var chatIcon = this.add.image(460, 475, 'chatIcon', 0);
+        // chatIcon.setScale(4);
+        // chatIcon.setDepth(11);
+        // chatIcon.setInteractive();
+        // chatIcon.on('pointerdown', this.chat, this);
+        // this.add.existing(chatIcon).setScrollFactor(0);
+        // this.chatButton = new TextButton(this, 425, 460, OL.CHAT_TEXT, { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.chat());
+        // this.chatButton.setDepth(11);
+        // this.add.existing(this.chatButton).setScrollFactor(0);
 
-        this.add.dom(OL.world.width/2, OL.world.height/2).createFromCache('chatBox').setScrollFactor(0);
-        document.getElementById("chat-box").style.display = "none";
+        // this.add.dom(OL.world.width/2, OL.world.height/2).createFromCache('chatBox').setScrollFactor(0);
+        // document.getElementById("chat-box").style.display = "none";
+        // const MAX_LENGTH = 100;
+        // document.getElementById('chat-entry').onkeyup = function () {
+        //     console.log("chat entered");
+        //     document.getElementById('char-count').innerHTML = (this.value.length) + "/" + MAX_LENGTH;
+        // };
+
+        // this.zoomButton = new TextButton(this, 425, 10, "zoom", { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.zoomIn());
+        // this.zoomButton.setDepth(11);
+        // this.add.existing(this.zoomButton).setScrollFactor(0);
 
         console.log("welcome to the online lounge");
         console.log(OL.username, " (password: " + OL.password + ")");
@@ -89,22 +108,14 @@ export class OnlineLounge extends Phaser.Scene {
 
     update(time, delta) {
         this.playerHandler(delta);
-        console.log(this.player.x, this.player.y)
-        this.physics.world.collide(this.player, this.cuteGuy);
-        let random = OL.getRandomInt(0, 50);
-        if (random === 25) {
-            console.log("generate butterfly");
-            this.generateButterfly();
-        }
+        this.updateAllButterflies();
         this.cameraDolly.x = Math.floor(this.player.x);
         this.cameraDolly.y = Math.floor(this.player.y);
     }
 
     chat() {
-        // chat
         if (this.chatButton.text === OL.CHAT_TEXT) {
             this.openChatBox();
-        // send
         } else {
             this.sendChat();
         }
@@ -113,6 +124,7 @@ export class OnlineLounge extends Phaser.Scene {
     zoomIn() {
         this.camera.pan(this.player.x, this.player.y, 100, 'Power2');
         this.camera.zoomTo(2, 2000);
+        this.zoomButton.x = this.zoomButton.x/4;
     }
 
     zoomOut() {
@@ -121,30 +133,20 @@ export class OnlineLounge extends Phaser.Scene {
     }
 
     openChatBox() {
-        this.chatting = true;
         this.chatButton.setText(OL.SEND_TEXT);
         document.getElementById("chat-box").style.display = "block";
-        this.player.typingIcon.setActive(true).setVisible(true);
-        this.player.typing = true;
+        this.player.startTyping();
+        var chatBox = document.getElementById("chat-entry");
+        chatBox.focus();
         this.input.keyboard.enabled = false;
     }
 
     sendChat() {
-        this.chatting = false;
-        this.setPlayerMsg(document.getElementById("chat-entry").value);
+        this.player.setMsg(document.getElementById("chat-entry").value);
         document.getElementById("chat-entry").value = "";
-        this.player.speakText.setText(this.player.msg);
         this.chatButton.setText(OL.CHAT_TEXT);
-        this.player.typingIcon.setActive(false).setVisible(false);
-        this.player.typing = false;
         document.getElementById("chat-box").style.display = "none";
-
         this.input.keyboard.enabled = true;
-    }
-
-    setPlayerMsg(msg) {
-        this.player.msg = msg;
-        this.player.msg_duration = 0;
     }
 
     generateCuteGuy() {
@@ -155,104 +157,30 @@ export class OnlineLounge extends Phaser.Scene {
         return cuteGuy;
     }
 
-    generateSpeakText(player) {
-        var speakText = this.add.text(player.x,player.y-player.size, "");
-        speakText.setStroke('black', 3);
-        speakText.setAlign('center');
-        return speakText;
-    }
-
-    generatePlayer(username, size) {
-        var player = this.physics.add.sprite(50, 50, 'playerDefault');
-
-        player.anims.create({
-            key: 'down', 
-            frameRate: OL.WALKING_FRAMERATE,
-            frames: this.anims.generateFrameNumbers('playerDefault', { frames: [0, 1, 0, 2] }),
-            repeat: -1
-        });
-        player.anims.create({
-            key: 'left', 
-            frameRate: OL.WALKING_FRAMERATE,
-            frames: this.anims.generateFrameNumbers('playerDefault', { frames: [9, 10, 9, 11] }),
-            repeat: -1
-        });
-        player.anims.create({
-            key: 'right', 
-            frameRate: OL.WALKING_FRAMERATE,
-            frames: this.anims.generateFrameNumbers('playerDefault', { frames: [3, 4, 3, 5] }),
-            repeat: -1
-        });
-        player.anims.create({
-            key: 'up', 
-            frameRate: OL.WALKING_FRAMERATE,
-            frames: this.anims.generateFrameNumbers('playerDefault', { frames: [6, 7, 6, 8] }),
-            repeat: -1
-        });
-
-        player.alive = true;
-
-        player.username = username;
-        player.speed = OL.WALKING_SPEED;
-        player.size = 25;
-        player.msg = "";
-        player.msg_duration = 0;
-        player.typing = false;
-
-        player.usernameText = this.generateUsernameText(player);
-        player.speakText = this.generateSpeakText(player);
-        player.typingIcon = this.generateTypingIcon(player);
-
-        this.physics.world.enable(player);
+    generatePlayer(username) {
+        let player = new Player(this, 50, 50, 'playerDefault', username);
         this.physics.add.collider(player, this.worldLayer);
-
         return player;
     }
-
-    generateTypingIcon(player) {
-        var typingIcon = this.add.sprite(player.x + player.size / 2, player.y - player.size, 'typingIcon');
-
-        typingIcon.anims.create({
-            key: 'typing', 
-            frameRate: 3,
-            frames: typingIcon.anims.generateFrameNumbers('typingIcon', { frames: [0, 1, 2, 3] }),
-            repeat: -1
-        });
-
-        typingIcon.anims.play('typing');
-        typingIcon.setActive(false).setVisible(false);
-
-        return typingIcon;
-    }
-
+    
     generateButterfly() {
-        let butterfly = this.add.sprite(this.player.x + OL.getRandomInt(-250, 250), this.player.y + OL.getRandomInt(-250, 250), 'purpleButterfly');
-
-        butterfly.anims.create({
-            key: 'left', 
-            frameRate: 3,
-            frames: butterfly.anims.generateFrameNumbers('purpleButterfly', { frames: [0, 1] }),
-            repeat: -1
-        });
-
-        butterfly.anims.create({
-            key: 'right', 
-            frameRate: 3,
-            frames: butterfly.anims.generateFrameNumbers('purpleButterfly', { frames: [2, 3] }),
-            repeat: -1
-        });
-
-        butterfly.anims.play('left');
-        this.butterflies.push(butterfly);
-        return butterfly;
+        if(this.butterflies.length < 25) {
+            let butterfly = new Butterfly(this, this.player.x + OL.getRandomInt(-250, 250), this.player.y + OL.getRandomInt(-250, 250), 'purpleButterfly');
+            this.butterflies.push(butterfly);
+            return butterfly;
+        }
+        return null;
     }
 
-    generateUsernameText(player) {
-        var usernameText = this.add.text(player.x,player.y + player.size + 10, player.username);
-        console.log(player.username);
-        usernameText.setStroke('grey', 3);
-        usernameText.setAlign('center');
-        return usernameText;
+    updateAllButterflies() {
+        let random = OL.getRandomInt(0, 50);
+        if (random === 25) {
+            console.log("generate butterfly");
+            this.generateButterfly();
+        }
+        this.butterflies.forEach( (butterfly) => {
+            butterfly.update();
+        })
     }
 
     updateAllPlayers(playerDataList) {
@@ -262,71 +190,21 @@ export class OnlineLounge extends Phaser.Scene {
                 this.players.set(playerData.id, this.generatePlayer(playerData.username));
                 console.log(this.players.get(playerData.id));
             } else if (playerToUpdate) {
-                playerToUpdate.setVelocityX(playerData.velocity.x);
-                playerToUpdate.setVelocityY(playerData.velocity.y);
-                playerToUpdate.x = playerData.position.x;
-                playerToUpdate.y = playerData.position.y;
-                this.animForPlayerFromVelocity(playerToUpdate);
-                if (playerData.typing) {
-                    playerToUpdate.typingIcon.setActive(true).setVisible(true);
-                } else {
-                    if (playerToUpdate.typingIcon.active) {
-                        playerToUpdate.typingIcon.setActive(false).setVisible(false);
-                    }
-                    playerToUpdate.speakText.setText(playerData.msg);
-                }
-
-                this.updatePlayerStuff(playerToUpdate);
+                playerToUpdate.updateFromData(playerData);
             }
         });
     }
 
-    animForPlayerFromVelocity(player) {
-        if (player.body.velocity.x > 0) {
-            player.anims.play('right', true);
-        } else if ( player.body.velocity.x < 0) {
-            player.anims.play('left', true);
-        } else if ( player.body.velocity.y > 0) {
-            player.anims.play('down', true);
-        } else if ( player.body.velocity.y < 0) {
-            player.anims.play('up', true);
-        } else {
-            player.anims.pause();
-        }
-    }
-
     playerHandler(delta) {
+        this.physics.world.collide(this.player, this.cuteGuy);
         if (this.player.alive) {
             if (OL.IS_MOBILE) {
                 this.playerMobileMovementHandler();
             } else {
                 this.playerMovementHandler();
             }
-            this.playerMsgDecayHandler(delta);
-            this.updatePlayerStuff(this.player);
-        }
-    }
-
-    updatePlayerStuff(player) {
-        player.speakText.x = player.x;
-        player.speakText.y = player.y - 50;
-
-        player.typingIcon.x = player.x + player.size /2;
-        player.typingIcon.y = player.y - player.size;
-
-        player.usernameText.x = player.x;
-        player.usernameText.y = player.y + 20;
-    }
-
-    playerMsgDecayHandler(delta) {
-        if (this.player.msg !== "") {
-            if (this.player.msg_duration > OL.MSG_MAXTIME) {
-                this.player.msg = "";
-                this.player.speakText.setText(this.player.msg);
-                this.player.msg_duration = 0;
-            } else {
-                this.player.msg_duration += delta;
-            }
+            this.player.msgDecayHandler(delta);
+            this.player.updatePlayerStuff();
         }
     }
 
@@ -379,19 +257,6 @@ export class OnlineLounge extends Phaser.Scene {
         }
     }
 
-    getAngle(cx, cy, ex, ey) {
-        var dy = ey - cy;
-        var dx = ex - cx;
-        var theta = Math.atan2(dy, dx); // range (-PI, PI]
-        theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
-        //if (theta < 0) theta = 360 + theta; // range [0, 360)
-        return theta;
-    }
-
-    getDistance(x1, y1, x2, y2) {
-        return Math.sqrt(Math.pow(x1-x2, 2), Math.pow(y1-y2, 2));
-    }
-
     setPlayerSpeedFromTouchAngle(angle) {
         if (angle >= -22.5 && angle <= 22.5) { //right
             this.player.setVelocityX(this.player.speed);
@@ -426,12 +291,15 @@ export class OnlineLounge extends Phaser.Scene {
 
     playerMobileMovementHandler() {
         var pointer = this.input.activePointer;
-        if (!this.chatting && pointer.isDown) {
+        if ((!this.player.typing && pointer.isDown)) {
             var touchX = pointer.x;
             var touchY = pointer.y;
-            var touchWorldPoint = this.camera.getWorldPoint(touchX, touchY);
-            if (this.getDistance(this.player.body.position.x, this.player.body.position.y, touchWorldPoint.x, touchWorldPoint.y) > 29) {
-                this.setPlayerSpeedFromTouchAngle(this.getAngle(this.player.body.position.x, this.player.body.position.y, touchWorldPoint.x, touchWorldPoint.y));
+            console.log(touchX, touchY);
+            if (touchX <= 410 || touchY <= 440) {
+                var touchWorldPoint = this.camera.getWorldPoint(touchX, touchY);
+                if (OL.getDistance(this.player.body.position.x, this.player.body.position.y, touchWorldPoint.x, touchWorldPoint.y) > 29) {
+                    this.setPlayerSpeedFromTouchAngle(OL.getAngle(this.player.body.position.x, this.player.body.position.y, touchWorldPoint.x, touchWorldPoint.y));
+                }
             }
         } else {
             this.player.setVelocityX(0);

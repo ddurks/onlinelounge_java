@@ -1,4 +1,5 @@
 import { OL } from './utils';
+import { Stomp } from './lib/stomp';
 
 export class GamServerClient {
     constructor() {
