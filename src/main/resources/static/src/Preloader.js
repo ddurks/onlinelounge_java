@@ -16,6 +16,12 @@ export class Preloader extends Phaser.Scene {
 		this.load.spritesheet('typingIcon', 'assets/typing.png', { frameWidth: 16, frameHeight: 16, margin: 0, spacing: 0 });
 		this.load.spritesheet('chatIcon', 'assets/chat-button.png', {frameWidth: 24, frameHeight: 16});
 		this.load.spritesheet('purpleButterfly', 'assets/sprites/butterfly-purple-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
+		this.load.spritesheet('blueButterfly', 'assets/sprites/butterfly-blue-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
+		this.load.spritesheet('orangeButterfly', 'assets/sprites/butterfly-orange-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
+		this.load.spritesheet('pinkButterfly', 'assets/sprites/butterfly-pink-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
+		this.load.spritesheet('coin', 'assets/sprites/coin-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
+		this.load.spritesheet('heart', 'assets/sprites/heart-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
+		this.load.spritesheet('onlineBouncer', 'assets/sprites/onlinebouncer-extruded.png', { frameWidth: 32, frameHeight: 48, margin: 1, spacing: 2 });
 		this.load.image('cute', 'assets/pleading_eyes_emoji.png');
 		this.load.image('groundTiles', "assets/tiles/online-pluto-tileset-extruded.png");
 		this.load.image('objectTiles', "assets/tiles/online-tileset-extruded.png");

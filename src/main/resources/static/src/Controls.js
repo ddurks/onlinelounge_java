@@ -31,7 +31,7 @@ export class Controls extends Phaser.Scene {
             document.getElementById('char-count').innerHTML = (this.value.length) + "/" + MAX_LENGTH;
         };
 
-        this.zoomButton = new TextButton(this, 425, 10, "zoom", { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.zoomIn());
+        this.zoomButton = new TextButton(this, 425, 10, "zoom", { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.zoom());
         this.zoomButton.setDepth(11);
         this.add.existing(this.zoomButton).setScrollFactor(0);
     }

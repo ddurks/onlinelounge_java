@@ -1,24 +1,27 @@
 import { OL, TextButton } from './utils';
 import { GamServerClient } from './GameServerClient';
 import { Player } from './Player';
-import { Butterfly } from './Butterfly';
-import { Controls } from './Controls';
+import { Butterfly, OnlineBouncer } from './Guys';
+import { Coin, Heart } from './Items';
 
 export class OnlineLounge extends Phaser.Scene {
     constructor() {
         super('OnlineLounge');
         this.players = new Map();
         this.butterflies = new Array();
+        this.coins = new Array();
+        this.hearts = new Array();
+        this.MAX_BUTTERFLIES = 4;
     }
 
     create() { 
         //map
-        var map = this.make.tilemap({ key: "map" });
-        var groundTileset = map.addTilesetImage("online-pluto-tileset-extruded", "groundTiles");
-        var objectTileset = map.addTilesetImage("online-tileset-extruded", "objectTiles");
-        var belowLayer = map.createLayer("below", groundTileset, 0, 0);
-        this.worldLayer = map.createLayer("world", objectTileset, 0, 0);
-        var aboveLayer = map.createLayer("above", objectTileset, 0, 0);
+        this.map = this.make.tilemap({ key: "map" });
+        var groundTileset = this.map.addTilesetImage("online-pluto-tileset-extruded", "groundTiles");
+        var objectTileset = this.map.addTilesetImage("online-tileset-extruded", "objectTiles");
+        var belowLayer = this.map.createLayer("below", groundTileset, 0, 0);
+        this.worldLayer = this.map.createLayer("world", objectTileset, 0, 0);
+        var aboveLayer = this.map.createLayer("above", objectTileset, 0, 0);
         this.worldLayer.setCollisionByProperty({ collides: true });
         aboveLayer.setDepth(10);
 
@@ -43,13 +46,14 @@ export class OnlineLounge extends Phaser.Scene {
 
         this.cameraDolly = new Phaser.Geom.Point(this.player.x, this.player.y);
         this.camera.startFollow(this.player, true);
-        this.camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+        this.camera.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
         this.scene.get('Controls').events.on('openChat', () => this.openChatBox());
         this.scene.get('Controls').events.on('sendChat', () => this.sendChat());
         this.scene.get('Controls').events.on('zoomIn', () => this.zoomIn());
         this.scene.get('Controls').events.on('zoomOut', () => this.zoomOut());
 
+        this.onlineBouncer = new OnlineBouncer(this, 624, 396);
 
         console.log("welcome to the online lounge");
         console.log(OL.username, " (password: " + OL.password + ")");
@@ -90,6 +94,7 @@ export class OnlineLounge extends Phaser.Scene {
     update(time, delta) {
         this.playerHandler(delta);
         this.updateAllButterflies();
+        OL.getRandomInt(0,30) === 25 ? this.updateCoins() : this.updateHearts();
         this.cameraDolly.x = Math.floor(this.player.x);
         this.cameraDolly.y = Math.floor(this.player.y);
     }
@@ -97,13 +102,13 @@ export class OnlineLounge extends Phaser.Scene {
     zoomIn() {
         console.log("zoom in");
         this.camera.pan(this.player.x, this.player.y, 100, 'Power2');
-        this.camera.zoomTo(2, 2000);
+        this.camera.zoomTo(2, 1000);
     }
 
     zoomOut() {
         console.log("zoom out");
         this.camera.pan(this.player.x, this.player.y, 100, 'Power2');
-        this.camera.zoomTo(1, 2000);    
+        this.camera.zoomTo(1, 1000);    
     }
 
     openChatBox() {
@@ -124,6 +129,24 @@ export class OnlineLounge extends Phaser.Scene {
         return cuteGuy;
     }
 
+    updateCoins() {
+        if(this.coins.length < 25) {
+            let coin = new Coin(this, OL.getRandomInt(0, this.map.widthInPixels), OL.getRandomInt(0, this.map.heightInPixels));
+            console.log("new coin");
+            console.log(coin.x, coin.y);
+            this.coins.push(coin);
+        }
+    }
+
+    updateHearts() {
+        if(this.hearts.length < 50) {
+            let heart = new Heart(this, OL.getRandomInt(0, this.map.widthInPixels), OL.getRandomInt(0, this.map.heightInPixels));
+            console.log("new heart");
+            console.log(heart.x, heart.y);
+            this.hearts.push(heart);
+        }
+    }
+
     generatePlayer(username) {
         let player = new Player(this, 50, 50, 'playerDefault', username);
         this.physics.add.collider(player, this.worldLayer);
@@ -131,8 +154,8 @@ export class OnlineLounge extends Phaser.Scene {
     }
     
     generateButterfly() {
-        if(this.butterflies.length < 25) {
-            let butterfly = new Butterfly(this, this.player.x + OL.getRandomInt(-250, 250), this.player.y + OL.getRandomInt(-250, 250), 'purpleButterfly');
+        if(this.butterflies.length < this.MAX_BUTTERFLIES) {
+            let butterfly = new Butterfly(this, this.player.x + OL.getRandomInt(-250, 250), this.player.y + OL.getRandomInt(-250, 250));
             this.butterflies.push(butterfly);
             return butterfly;
         }
@@ -140,7 +163,7 @@ export class OnlineLounge extends Phaser.Scene {
     }
 
     updateAllButterflies() {
-        let random = OL.getRandomInt(0, 50);
+        let random = OL.getRandomInt(0, 1000);
         if (random === 25) {
             console.log("generate butterfly");
             this.generateButterfly();
@@ -168,6 +191,7 @@ export class OnlineLounge extends Phaser.Scene {
 
     playerHandler(delta) {
         this.physics.world.collide(this.player, this.cuteGuy);
+        this.physics.world.collide(this.player, this.onlineBouncer, () => {console.log("BOUNCER")})
         if (this.player.alive) {
             if (OL.IS_MOBILE) {
                 this.playerMobileMovementHandler();

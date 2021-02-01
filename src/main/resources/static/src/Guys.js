@@ -1,7 +1,22 @@
 import { OL } from './utils';
 
 export class Butterfly extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture) {
+    constructor(scene, x, y) {
+        var texture;
+        switch (OL.getRandomInt(0,3)) {
+            case 0:
+                texture = 'purpleButterfly';
+                break;
+            case 1:
+                texture = 'pinkButterfly';
+                break;
+            case 2:
+                texture = 'orangeButterfly';
+                break;
+            case 3:
+                texture = 'blueButterfly';
+                break;
+        }
         super(scene, x, y, texture);
 
         scene.add.existing(this);
@@ -10,14 +25,14 @@ export class Butterfly extends Phaser.Physics.Arcade.Sprite {
         this.anims.create({
             key: 'left', 
             frameRate: 3,
-            frames: this.anims.generateFrameNumbers('purpleButterfly', { frames: [0, 1] }),
+            frames: this.anims.generateFrameNumbers(texture, { frames: [0, 1] }),
             repeat: -1
         });
 
         this.anims.create({
             key: 'right', 
             frameRate: 3,
-            frames: this.anims.generateFrameNumbers('purpleButterfly', { frames: [2, 3] }),
+            frames: this.anims.generateFrameNumbers(texture, { frames: [2, 3] }),
             repeat: -1
         });
 
@@ -46,5 +61,23 @@ export class Butterfly extends Phaser.Physics.Arcade.Sprite {
         } else if ( this.body.velocity.x < 0) {
             this.anims.play('left', true);
         }
+    }
+}
+
+export class OnlineBouncer extends Phaser.Physics.Arcade.Sprite {
+    constructor(scene, x, y) {
+        super(scene, x, y, 'onlineBouncer');
+
+        var sprite = scene.physics.add.staticSprite(x, y, 'onlineBouncer');
+
+        sprite.anims.create({
+            key: 'idle', 
+            frameRate: 5,
+            frames: sprite.anims.generateFrameNumbers('onlineBouncer', { frames: [0, 0, 0, 0, 2, 3] }),
+            repeat: -1
+        });
+
+        sprite.anims.play('idle');
+        return sprite;
     }
 }
