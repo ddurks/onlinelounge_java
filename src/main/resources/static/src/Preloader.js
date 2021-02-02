@@ -23,9 +23,13 @@ export class Preloader extends Phaser.Scene {
 		this.load.spritesheet('heart', 'assets/sprites/heart-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
 		this.load.spritesheet('onlineBouncer', 'assets/sprites/onlinebouncer-extruded.png', { frameWidth: 32, frameHeight: 48, margin: 1, spacing: 2 });
 		this.load.image('cute', 'assets/pleading_eyes_emoji.png');
+		this.load.image('menuBar', 'assets/menu-bar.png');
+		this.load.image('popup', 'assets/popup.png');
+		this.load.image('olLogo', 'assets/logo.png');
 		this.load.image('groundTiles', "assets/tiles/online-pluto-tileset-extruded.png");
 		this.load.image('objectTiles', "assets/tiles/online-tileset-extruded.png");
 		this.load.image('groundTiles', "assets/tiles/online-lounge-objects-extruded.png");
+		
 		this.load.tilemapTiledJSON('map', 'assets/tiles/onlinepluto-tilemap-new.json');
 		this.load.tilemapTiledJSON('map', 'assets/tiles/onlinelounge-tilemap.json');
 

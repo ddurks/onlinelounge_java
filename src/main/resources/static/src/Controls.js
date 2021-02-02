@@ -12,6 +12,14 @@ export class Controls extends Phaser.Scene {
 
     create() {
         this.camera = this.cameras.main;
+        // create menu bar
+        var menuBar = this.add.image(0, 0, 'menuBar');
+        menuBar.setOrigin(0, 0);
+        menuBar.setDepth(11);
+        console.log(menuBar);
+        var logo = this.add.image(-1, -2, 'olLogo');
+        logo.setOrigin(0, 0);
+        logo.setDepth(11);
 
         // create chat button and chatbox
         // var chatIcon = this.add.image(460, 460, 'typingIcon', 0);
@@ -32,7 +40,7 @@ export class Controls extends Phaser.Scene {
         };
 
         this.zoomButton = new TextButton(this, 425, 10, "zoom", { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.zoom());
-        this.zoomButton.setDepth(11);
+        this.zoomButton.setDepth(12);
         this.add.existing(this.zoomButton).setScrollFactor(0);
     }
 
