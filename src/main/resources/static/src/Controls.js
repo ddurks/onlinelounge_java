@@ -39,9 +39,24 @@ export class Controls extends Phaser.Scene {
             document.getElementById('char-count').innerHTML = (this.value.length) + "/" + MAX_LENGTH;
         };
 
-        this.zoomButton = new TextButton(this, 425, 10, "zoom", { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.zoom());
+        this.zoomButton = new TextButton(this, 365, 15, "zoom", { fontFamily: 'gaming2',color:  '#000000' ,fontSize: '16px'}, () => this.zoom());
         this.zoomButton.setDepth(12);
         this.add.existing(this.zoomButton).setScrollFactor(0);
+
+        this.popup = this.add.image(64, 74, 'popup');
+        this.popup.setOrigin(0,0);
+        this.popup.setDepth(11);
+        this.popup.setVisible(false);
+        this.add.existing(this.popup).setScrollFactor(0);
+
+        this.scene.get('DigitalPlanet').events.on('playerLoaded', (result) => this.loadPlayerIcon(result));
+    }
+
+    loadPlayerIcon(result) {
+        var playerIcon = this.add.image(475, 22, result.texture, 12);
+        playerIcon.setScale(2);
+        playerIcon.setDepth(12);
+        this.add.existing(playerIcon).setScrollFactor(0);
     }
 
     chat() {

@@ -12,12 +12,12 @@ export class MainMenu extends Phaser.Scene {
 
         var emitter = particles.createEmitter({
             speed: 100,
-            scale: { start: 0.5, end: 0 },
+            scale: { start: 0.25, end: 0 },
             blendMode: 'ADD'
         });
 
         var logo = this.physics.add.image(100, 100, 'logo');
-        logo.setScale(0.5);
+        logo.setScale(0.25);
 
         logo.setVelocity(75, 125);
         logo.setBounce(1, 1);
@@ -25,7 +25,7 @@ export class MainMenu extends Phaser.Scene {
 
         emitter.startFollow(logo);
 
-        var text = this.add.text(10, 10, 'Please login to play', { color: 'white', fontFamily: 'Arial', fontSize: '32px '});
+        var text = this.add.text(10, 10, 'Please login to play', { color: 'white', fontFamily: 'gaming2', fontSize: '16px '});
 
         var element = this.add.dom(OL.world.width/2, OL.world.height/2).createFromCache('nameform');
 
@@ -78,6 +78,20 @@ export class MainMenu extends Phaser.Scene {
 
     clickStart(scene) {
         this.scene.start('Controls');
-        this.scene.start('OnlineLounge');
+        this.scene.start('DigitalPlanet', {
+            spawn: {
+                x: 50,
+                y: 75
+            },
+            mapKey: "map",
+            groundTileset: {
+                name: "online-pluto-tileset-extruded",
+                ref: "groundTiles"
+            },
+            objectTileset: {
+                name: "online-tileset-extruded",
+                ref: "objectTiles"
+            }
+        });
     }
 }

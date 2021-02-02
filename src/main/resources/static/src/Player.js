@@ -31,6 +31,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             frames: this.anims.generateFrameNumbers(texture, { frames: [6, 7, 6, 8] }),
             repeat: -1
         });
+        this.anims.create({
+            key: 'icon',
+            frameRate: 0,
+            frames: this.anims.generateFrameNumbers(texture, { frames: [12] }),
+            repeat: 0
+        })
 
         this.alive = true;
 

@@ -28,9 +28,9 @@ OL.fadeOutIn = function(passedCallback, context) {
     });  
 }
 OL.fadeOutScene = function(sceneName, context) {
-    context.cameras.main.fadeOut(0);
+    context.cameras.main.fadeOut(2000);
     context.time.addEvent({
-        delay: 0,
+        delay: 2000,
         callback: function() {
             context.scene.start(sceneName);
         },

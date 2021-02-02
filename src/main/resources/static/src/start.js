@@ -2,7 +2,7 @@ import 'phaser';
 import { Preloader } from './Preloader';
 import { Boot } from './Boot';
 import { MainMenu } from './MainMenu';
-import { OnlineLounge } from './OnlineLounge';
+import { DigitalPlanet } from './DigitalPlanet';
 import { Controls } from './Controls';
 
 var gameConfig = {
@@ -28,7 +28,7 @@ var gameConfig = {
 			debug: false,
 		}
     },
-	scene: [Boot, Preloader, MainMenu, OnlineLounge, Controls]
+	scene: [Boot, Preloader, MainMenu, DigitalPlanet, Controls]
 }
 var game = new Phaser.Game(gameConfig);
 window.focus();

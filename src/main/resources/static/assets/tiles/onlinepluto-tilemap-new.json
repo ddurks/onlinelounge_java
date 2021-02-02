@@ -37,9 +37,44 @@
          "width":30,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":4,
+         "name":"player",
+         "objects":[
+                {
+                 "gid":42,
+                 "height":32,
+                 "id":1,
+                 "name":"spawn",
+                 "rotation":0,
+                 "type":"spawn",
+                 "visible":true,
+                 "width":32,
+                 "x":32,
+                 "y":64
+                }, 
+                {
+                 "gid":10,
+                 "height":32,
+                 "id":2,
+                 "name":"bouncerSpawn",
+                 "rotation":0,
+                 "type":"spawn",
+                 "visible":true,
+                 "width":32,
+                 "x":608,
+                 "y":416
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":4,
- "nextobjectid":1,
+ "nextlayerid":5,
+ "nextobjectid":3,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",
@@ -48,7 +83,7 @@
         {
          "columns":10,
          "firstgid":1,
-         "image":"online-pluto-tileset-extruded.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/..\/code\/onlinelounge-phaser\/assets\/tiles\/online-pluto-tileset-extruded.png",
          "imageheight":204,
          "imagewidth":340,
          "margin":1,
@@ -61,7 +96,7 @@
         {
          "columns":8,
          "firstgid":61,
-         "image":"online-tileset-extruded.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/..\/code\/onlinelounge-phaser\/assets\/tiles\/online-tileset-extruded.png",
          "imageheight":204,
          "imagewidth":272,
          "margin":1,
@@ -454,7 +489,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -490,7 +525,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
