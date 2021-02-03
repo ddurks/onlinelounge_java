@@ -25,7 +25,7 @@ export class MainMenu extends Phaser.Scene {
 
         emitter.startFollow(logo);
 
-        var text = this.add.text(10, 10, 'Please login to play', { color: 'white', fontFamily: 'gaming2', fontSize: '16px '});
+        var text = this.add.text(10, 10, 'Please login to play', { color: '#d77bba', fontFamily: 'gaming2', fontSize: '16px '});
 
         var element = this.add.dom(OL.world.width/2, OL.world.height/2).createFromCache('nameform');
 
@@ -60,7 +60,6 @@ export class MainMenu extends Phaser.Scene {
             }
     
         });
-        console.log("main menu");
     }
 
     handleKey(e) {

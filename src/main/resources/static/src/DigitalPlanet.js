@@ -11,16 +11,20 @@ export class DigitalPlanet extends Phaser.Scene {
         this.butterflies = new Array();
         this.coins = new Array();
         this.hearts = new Array();
+        this.looks = new Array();
+        this.lookIndex = 0;
         this.MAX_BUTTERFLIES = 4;
     }
 
     init(data) {
-        this.prevData = this.startData;
+        if (data.exitTo) {
+            this.exitTo = data.exitTo;
+        }
         this.startData = data;
-        console.log(this.prevData, this.startData);
     }
 
     create() { 
+        this.looks = ['computer_guy', 'phone_guy', 'cute_guy'];
         //map
         this.map = this.make.tilemap({ key: this.startData.mapKey });
         this.groundTileset = this.map.addTilesetImage(this.startData.groundTileset.name, this.startData.groundTileset.ref);
@@ -47,11 +51,17 @@ export class DigitalPlanet extends Phaser.Scene {
 
             if (object.name === 'bouncerSpawn') {
                 this.onlineBouncer = new OnlineBouncer(this, object.x + 16, object.y - 24);
+                if (this.startData.mapKey === "map") {
+                    this.worldLayer.setTileLocationCallback(object.x / object.width, object.y / object.width - 1, 1, 1, this.enterLounge, this);
+                }
             }
 
             if (object.name === 'exit') {
-                console.log(object);
-                console.log(this.worldLayer.setTileLocationCallback(object.x / object.width, object.y / object.width, 1, 1, this.exit, this));
+                this.worldLayer.setTileLocationCallback(object.x / object.width, object.y / object.width - 1, 1, 1, this.exit, this);
+            }
+
+            if (object.type === 'info') {
+                this.worldLayer.setTileLocationCallback(object.x / object.width, object.y / object.width - 1, 1, 1, () => this.events.emit('displayPopup', {text: object.name}), this);
             }
         });
 
@@ -74,19 +84,37 @@ export class DigitalPlanet extends Phaser.Scene {
         this.scene.get('Controls').events.on('sendChat', () => this.sendChat());
         this.scene.get('Controls').events.on('zoomIn', () => this.zoomIn());
         this.scene.get('Controls').events.on('zoomOut', () => this.zoomOut());
+        this.scene.get('Controls').events.on('lookChange', () => this.changeLook());
 
-        console.log("welcome to the online lounge");
-        console.log(OL.username, " (password: " + OL.password + ")");
+        console.log("logged in - " + OL.username, " (password: " + OL.password + ")");
         this.gameServer = this.generateGameServerConnectionClient();
     }
 
+    changeLook() {
+        console.log("changeLook");
+        if (this.lookIndex < this.looks.length - 1) {
+            this.lookIndex++;
+        } else {
+            this.lookIndex = 0;
+        }
+        let pos = {
+            x: this.player.x,
+            y: this.player.y
+        }
+        this.player.destroyStuff();
+        this.player.destroy();
+        this.player = this.generatePlayer(pos.x, pos.y, OL.username);
+        this.camera.startFollow(this.player, true);
+        this.camera.setBounds(0, -48, this.map.widthInPixels, this.map.heightInPixels);
+    }
+
     exit() {
-        if (this.prevData) {
-            this.prevData.spawn = {
+        if (this.exitTo) {
+            this.exitTo.spawn = {
                 x: 525,
                 y: 325
             }
-            this.scene.restart(this.prevData);
+            this.scene.restart(this.exitTo);
         }
     }
     generateGameServerConnectionClient() {
@@ -103,7 +131,6 @@ export class DigitalPlanet extends Phaser.Scene {
               var playerListJson = JSON.parse(messageOutput.body);
               this.updateAllPlayers(playerListJson);
           });
-          console.log(this.player.username);
           serverClient.sendMessage("/app/join", this.player.username);
           this.time.addEvent({ delay: 1000/30, callback: () => {
             serverClient.updatePlayer(JSON.stringify({
@@ -129,13 +156,11 @@ export class DigitalPlanet extends Phaser.Scene {
     }
 
     zoomIn() {
-        console.log("zoom in");
         this.camera.pan(this.player.x, this.player.y, 100, 'Power2');
         this.camera.zoomTo(2, 1000);
     }
 
     zoomOut() {
-        console.log("zoom out");
         this.camera.pan(this.player.x, this.player.y, 100, 'Power2');
         this.camera.zoomTo(1, 1000);    
     }
@@ -177,7 +202,7 @@ export class DigitalPlanet extends Phaser.Scene {
     }
 
     generatePlayer(x, y, username) {
-        let player = new Player(this, x, y, 'playerDefault', username);
+        let player = new Player(this, x, y, this.looks[this.lookIndex], username);
         this.physics.add.collider(player, this.worldLayer);
         this.events.emit('playerLoaded', {texture: player.texture.key});
         return player;
@@ -220,7 +245,7 @@ export class DigitalPlanet extends Phaser.Scene {
     }
 
     playerHandler(delta) {
-        this.physics.world.collide(this.player, this.onlineBouncer, () => this.enterLounge());
+        // this.physics.world.collide(this.player, this.onlineBouncer, () => this.enterLounge());
         if (this.player.alive) {
             if (OL.IS_MOBILE) {
                 this.playerMobileMovementHandler();
@@ -242,7 +267,8 @@ export class DigitalPlanet extends Phaser.Scene {
             objectTileset: {
                 name: "online-lounge-objects-extruded",
                 ref: "loungeTiles"
-            }
+            },
+            exitTo: this.startData
         });
     }
 
@@ -332,8 +358,7 @@ export class DigitalPlanet extends Phaser.Scene {
         if ((!this.player.typing && pointer.isDown)) {
             var touchX = pointer.x;
             var touchY = pointer.y;
-            console.log(touchX, touchY);
-            if (touchX <= 410 || touchY <= 440) {
+            if (touchX <= 410 || (touchY <= 440 && touchY >= 48)) {
                 var touchWorldPoint = this.camera.getWorldPoint(touchX, touchY);
                 if (OL.getDistance(this.player.body.position.x, this.player.body.position.y, touchWorldPoint.x, touchWorldPoint.y) > 29) {
                     this.setPlayerSpeedFromTouchAngle(OL.getAngle(this.player.body.position.x, this.player.body.position.y, touchWorldPoint.x, touchWorldPoint.y));

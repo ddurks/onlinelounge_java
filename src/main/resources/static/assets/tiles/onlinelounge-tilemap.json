@@ -73,6 +73,18 @@
                  "visible":true,
                  "width":32,
                  "x":0,
+                 "y":96
+                }, 
+                {
+                 "gid":7,
+                 "height":32,
+                 "id":13,
+                 "name":"bouncerSpawn",
+                 "rotation":0,
+                 "type":"spawn",
+                 "visible":true,
+                 "width":32,
+                 "x":0,
                  "y":64
                 }],
          "opacity":1,
@@ -82,7 +94,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":13,
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",

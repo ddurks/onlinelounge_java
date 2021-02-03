@@ -14,7 +14,6 @@ export class Boot extends Phaser.Scene {
             centerX: this.cameras.main.centerX,
             centerY: this.cameras.main.centerY
         };
-        console.log("boot");
         this.scene.start('Preloader');
     }
 }

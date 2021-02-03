@@ -1,4 +1,12 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"json",
+         "target":"onlinepluto-tilemap-new.json"
+        }
+    },
  "height":30,
  "infinite":false,
  "layers":[
@@ -66,15 +74,87 @@
                  "width":32,
                  "x":608,
                  "y":416
+                }, 
+                {
+                 "gid":107,
+                 "height":32,
+                 "id":3,
+                 "name":"hmmm. locked.",
+                 "rotation":0,
+                 "type":"info",
+                 "visible":true,
+                 "width":32,
+                 "x":704,
+                 "y":800
+                }, 
+                {
+                 "gid":62,
+                 "height":32,
+                 "id":4,
+                 "name":"welcome to the digital planet! have a look around.",
+                 "rotation":0,
+                 "type":"info",
+                 "visible":true,
+                 "width":32,
+                 "x":96,
+                 "y":64
+                }, 
+                {
+                 "gid":63,
+                 "height":32,
+                 "id":6,
+                 "name":"weird vibes in this area. be careful!",
+                 "rotation":0,
+                 "type":"info",
+                 "visible":true,
+                 "width":32,
+                 "x":896,
+                 "y":64
+                }, 
+                {
+                 "gid":74,
+                 "height":32,
+                 "id":7,
+                 "name":"locked. if only you had the key...",
+                 "rotation":0,
+                 "type":"info",
+                 "visible":true,
+                 "width":32,
+                 "x":832,
+                 "y":64
+                }, 
+                {
+                 "gid":71,
+                 "height":32,
+                 "id":8,
+                 "name":"the famous online lounge -->",
+                 "rotation":0,
+                 "type":"info",
+                 "visible":true,
+                 "width":32,
+                 "x":352,
+                 "y":416
+                }, 
+                {
+                 "gid":72,
+                 "height":32,
+                 "id":9,
+                 "name":"online... bones! :O",
+                 "rotation":0,
+                 "type":"info",
+                 "visible":true,
+                 "width":32,
+                 "x":896,
+                 "y":192
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":3,
+ "nextobjectid":10,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",

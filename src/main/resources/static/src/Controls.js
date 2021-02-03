@@ -1,13 +1,15 @@
+import { PopUp } from "./PopUp";
 import { TextButton, OL } from "./utils";
 
 export class Controls extends Phaser.Scene {
-    constructor(slaveScene) {
+    constructor() {
         super('Controls');
 
         this.CHAT_TEXT = "chat";
         this.SEND_TEXT = "send";
         this.chatText = this.CHAT_TEXT;
         this.zoomed = false;
+        this.prevPopupText = "";
     }
 
     create() {
@@ -16,7 +18,6 @@ export class Controls extends Phaser.Scene {
         var menuBar = this.add.image(0, 0, 'menuBar');
         menuBar.setOrigin(0, 0);
         menuBar.setDepth(11);
-        console.log(menuBar);
         var logo = this.add.image(-1, -2, 'olLogo');
         logo.setOrigin(0, 0);
         logo.setDepth(11);
@@ -35,7 +36,6 @@ export class Controls extends Phaser.Scene {
         document.getElementById("chat-box").style.display = "none";
         const MAX_LENGTH = 100;
         document.getElementById('chat-entry').onkeyup = function () {
-            console.log("chat entered");
             document.getElementById('char-count').innerHTML = (this.value.length) + "/" + MAX_LENGTH;
         };
 
@@ -43,20 +43,9 @@ export class Controls extends Phaser.Scene {
         this.zoomButton.setDepth(12);
         this.add.existing(this.zoomButton).setScrollFactor(0);
 
-        this.popup = this.add.image(64, 74, 'popup');
-        this.popup.setOrigin(0,0);
-        this.popup.setDepth(11);
-        this.popup.setVisible(false);
-        this.add.existing(this.popup).setScrollFactor(0);
+        this.popup = new PopUp(this);
 
-        this.scene.get('DigitalPlanet').events.on('playerLoaded', (result) => this.loadPlayerIcon(result));
-    }
-
-    loadPlayerIcon(result) {
-        var playerIcon = this.add.image(475, 22, result.texture, 12);
-        playerIcon.setScale(2);
-        playerIcon.setDepth(12);
-        this.add.existing(playerIcon).setScrollFactor(0);
+        this.scene.get('DigitalPlanet').events.on('displayPopup', (info) => this.displayPopup(info));
     }
 
     chat() {
@@ -100,5 +89,12 @@ export class Controls extends Phaser.Scene {
     zoomOut() {
         this.zoomed = false;
         this.events.emit('zoomOut');
+    }
+
+    displayPopup(info) {
+        if (info.text !== this.prevPopupText) {
+            this.popup.display(info.text);
+            this.prevPopupText = info.text;
+        }
     }
 }

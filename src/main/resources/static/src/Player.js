@@ -56,15 +56,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     generateSpeakText(scene, player) {
         var speakText = scene.add.text(player.x,player.y-player.size, "", {
-            fontFamily: 'gaming2',
-            fontSize: '8px',
+            fontFamily: 'Arial',
+            fontSize: '16px',
             wordWrap: {
-                width: 200,
+                width: 400,
                 useAdvancedWrap: true
             },
             align: 'center'
         });
-        speakText.setStroke('#000000', 4)
+        speakText.setStroke('#000000', 3);
+        speakText.setOrigin(0.5, 0);
         return speakText;
     }
 
@@ -85,7 +86,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     generateUsernameText(scene, player) {
-        var usernameText = scene.add.text(player.x,player.y, player.username, {
+        var usernameText = scene.add.text(player.x + 2,player.y, player.username, {
             fontFamily: 'gaming1',
             color:  '#ffffff' ,
             fontSize: '32px',
@@ -98,6 +99,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
                 fill: true,
             },
         });
+        usernameText.setOrigin(0.5, 0);
         usernameText.setAlign('center');
         return usernameText;
     }
@@ -168,5 +170,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
                 this.msg_duration += delta;
             }
         }
+    }
+
+    destroyStuff() {
+        this.speakText.destroy();
+        this.usernameText.destroy();
+        this.typingIcon.destroy();
     }
 }

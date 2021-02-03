@@ -12,7 +12,6 @@ export class GamServerClient {
     }
   
     connect(username, callback) {
-        console.log("connecting to: " + OL.SERVER_URL);
         this.stompClient.connect({}, (result) => {
             callback(result);
         });
