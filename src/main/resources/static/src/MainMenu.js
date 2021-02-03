@@ -78,6 +78,7 @@ export class MainMenu extends Phaser.Scene {
     clickStart(scene) {
         this.scene.start('Controls');
         this.scene.start('DigitalPlanet', {
+            butterflies: 3,
             mapKey: "map",
             groundTileset: {
                 name: "online-pluto-tileset-extruded",

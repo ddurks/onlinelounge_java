@@ -43,16 +43,18 @@ export class Butterfly extends Phaser.Physics.Arcade.Sprite {
     }
 
     update() {
-        let rand = OL.getRandomInt(0,50);
-        if (rand === 1) {
-            this.setVelocity(OL.getRandomInt(-100, 100), OL.getRandomInt(-300, 300));
-        } else if (rand > 43) {
-            this.setVelocity(0, 0);
+        if (this.body) {
+            let rand = OL.getRandomInt(0,50);
+            if (rand === 1) {
+                this.setVelocity(OL.getRandomInt(-100, 100), OL.getRandomInt(-300, 300));
+            } else if (rand > 43) {
+                this.setVelocity(0, 0);
+            }
+            if (this.y >= this.homeY) {
+                this.setVelocityY(OL.getRandomInt(-200, 0));
+            }
+            this.animForButterfly();
         }
-        if (this.y >= this.homeY) {
-            this.setVelocityY(OL.getRandomInt(-200, 0));
-        }
-        this.animForButterfly();
     }
 
     animForButterfly() {

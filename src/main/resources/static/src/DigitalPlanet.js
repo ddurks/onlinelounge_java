@@ -13,7 +13,7 @@ export class DigitalPlanet extends Phaser.Scene {
         this.hearts = new Array();
         this.looks = new Array();
         this.lookIndex = 0;
-        this.MAX_BUTTERFLIES = 4;
+        this.MAX_BUTTERFLIES = 0;
     }
 
     init(data) {
@@ -21,6 +21,14 @@ export class DigitalPlanet extends Phaser.Scene {
             this.exitTo = data.exitTo;
         }
         this.startData = data;
+        
+        if (this.startData.butterflies) {
+            this.MAX_BUTTERFLIES = this.startData.butterflies;
+        } else {
+            this.MAX_BUTTERFLIES = 0;
+            this.butterflies = [];
+        }
+        console.log(this.MAX_BUTTERFLIES);
     }
 
     create() { 
@@ -36,7 +44,6 @@ export class DigitalPlanet extends Phaser.Scene {
         this.aboveLayer.setDepth(10);
 
         this.player, this.onlineBouncer;
-
         if (this.startData.spawn) {
             this.player = this.generatePlayer(this.startData.spawn.x, this.startData.spawn.y, OL.username);
             this.physics.add.collider(this.player, this.worldLayer);
@@ -149,7 +156,7 @@ export class DigitalPlanet extends Phaser.Scene {
 
     update(time, delta) {
         this.playerHandler(delta);
-        // this.updateAllButterflies();
+        this.updateAllButterflies();
         // OL.getRandomInt(0,30) === 25 ? this.updateCoins() : this.updateHearts();
         this.cameraDolly.x = Math.floor(this.player.x);
         this.cameraDolly.y = Math.floor(this.player.y);
@@ -218,18 +225,20 @@ export class DigitalPlanet extends Phaser.Scene {
     }
 
     updateAllButterflies() {
-        let random = OL.getRandomInt(0, 1000);
-        if (random === 25) {
-            console.log("generate butterfly");
-            this.generateButterfly();
-        }
-        this.butterflies.forEach( (butterfly, index, butterflies) => {
-            butterfly.update();
-            if (!this.camera.worldView.contains(butterfly.x,butterfly.y)) {
-                butterflies.splice(index, 1);
-                butterfly.destroy();
+        if (this.MAX_BUTTERFLIES > 0) {
+            let random = OL.getRandomInt(0, 1000);
+            if (random === 25) {
+                console.log("generate butterfly");
+                this.generateButterfly();
             }
-        })
+            this.butterflies.forEach( (butterfly, index, butterflies) => {
+                butterfly.update();
+                if (!this.camera.worldView.contains(butterfly.x,butterfly.y)) {
+                    butterflies.splice(index, 1);
+                    butterfly.destroy();
+                }
+            });
+        }
     }
 
     updateAllPlayers(playerDataList) {
