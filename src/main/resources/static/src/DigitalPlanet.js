@@ -32,8 +32,14 @@ export class DigitalPlanet extends Phaser.Scene {
         this.aboveLayer.setDepth(10);
 
         this.player, this.onlineBouncer;
+
+        if (this.startData.spawn) {
+            this.player = this.generatePlayer(this.startData.spawn.x, this.startData.spawn.y, OL.username);
+            this.physics.add.collider(this.player, this.worldLayer);
+            this.physics.world.enable(this.player);  
+        }
         this.map.findObject('player', (object) => {
-            if (object.name === 'spawn') {
+            if (object.name === 'spawn' && !this.startData.spawn) {
                 this.player = this.generatePlayer(object.x, object.y, OL.username);
                 this.physics.add.collider(this.player, this.worldLayer);
                 this.physics.world.enable(this.player);
@@ -41,6 +47,11 @@ export class DigitalPlanet extends Phaser.Scene {
 
             if (object.name === 'bouncerSpawn') {
                 this.onlineBouncer = new OnlineBouncer(this, object.x + 16, object.y - 24);
+            }
+
+            if (object.name === 'exit') {
+                console.log(object);
+                console.log(this.worldLayer.setTileLocationCallback(object.x / object.width, object.y / object.width, 1, 1, this.exit, this));
             }
         });
 
@@ -69,6 +80,15 @@ export class DigitalPlanet extends Phaser.Scene {
         this.gameServer = this.generateGameServerConnectionClient();
     }
 
+    exit() {
+        if (this.prevData) {
+            this.prevData.spawn = {
+                x: 525,
+                y: 325
+            }
+            this.scene.restart(this.prevData);
+        }
+    }
     generateGameServerConnectionClient() {
         var serverClient = new GamServerClient();
         serverClient.connect(this.player.username, (result) => {
@@ -214,10 +234,6 @@ export class DigitalPlanet extends Phaser.Scene {
 
     enterLounge() {
         this.scene.restart({
-            spawn: {
-                x: 256,
-                y: 512 - 16
-            },
             mapKey: "loungeMap",
             groundTileset: {
                 name: "online-lounge-objects-extruded",
