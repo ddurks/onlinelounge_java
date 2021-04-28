@@ -14,6 +14,9 @@ export class DigitalPlanet extends Phaser.Scene {
         this.looks = new Array();
         this.lookIndex = 0;
         this.MAX_BUTTERFLIES = 0;
+        this.subscribed = false;
+        var client = new GamServerClient(OL.username, this);
+        this.serverClient = client.connect(() => {});
     }
 
     init(data) {
@@ -28,7 +31,6 @@ export class DigitalPlanet extends Phaser.Scene {
             this.MAX_BUTTERFLIES = 0;
             this.butterflies = [];
         }
-        console.log(this.MAX_BUTTERFLIES);
     }
 
     create() { 
@@ -47,7 +49,8 @@ export class DigitalPlanet extends Phaser.Scene {
         if (this.startData.spawn) {
             this.player = this.generatePlayer(this.startData.spawn.x, this.startData.spawn.y, OL.username);
             this.physics.add.collider(this.player, this.worldLayer);
-            this.physics.world.enable(this.player);  
+            this.physics.world.enable(this.player); 
+            this.player.playerId = this.serverClient.playerId;
         }
         this.map.findObject('player', (object) => {
             if (object.name === 'spawn' && !this.startData.spawn) {
@@ -124,23 +127,13 @@ export class DigitalPlanet extends Phaser.Scene {
             this.scene.restart(this.exitTo);
         }
     }
-    generateGameServerConnectionClient() {
-        var serverClient = new GamServerClient();
-        serverClient.connect(this.player.username, (result) => {
-          this.player.playerId = result.headers['user-name'];
-          serverClient.stompClient.subscribe('/user/topic/access', (messageOutput) => {
-            // TODO
-          });
-          serverClient.stompClient.subscribe('/topic/chat', (messageOutput) => {
-            // TODO
-          });
-          serverClient.stompClient.subscribe('/topic/state', (messageOutput) => {
-              var playerListJson = JSON.parse(messageOutput.body);
-              this.updateAllPlayers(playerListJson);
-          });
-          serverClient.sendMessage("/app/join", this.player.username);
-          this.time.addEvent({ delay: 1000/30, callback: () => {
-            serverClient.updatePlayer(JSON.stringify({
+    async generateGameServerConnectionClient() {
+        this.time.addEvent({ delay: 1000/30, callback: () => {
+          if (this.serverClient) {
+            if (!this.subscribed) {
+              this.subscribeToUpdates();
+            }
+            this.serverClient.updatePlayer(JSON.stringify({
                 msg: this.player.msg,
                 typing: this.player.typing,
                 position: {
@@ -148,10 +141,18 @@ export class DigitalPlanet extends Phaser.Scene {
                     y: this.player.y
                 },
                 velocity: this.player.body.velocity
-                }));
-          }, callbackScope: this, loop: true });
-        });
-        return serverClient;
+              })
+            );
+          }
+        }, callbackScope: this, loop: true });
+    }
+
+    subscribeToUpdates() {
+      this.serverClient.stompClient.subscribe('/topic/state', (messageOutput) => {
+        var playerListJson = JSON.parse(messageOutput.body);
+        this.updateAllPlayers(playerListJson);
+      });
+      this.subscribed = true;
     }
 
     update(time, delta) {
