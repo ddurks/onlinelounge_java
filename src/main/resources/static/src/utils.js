@@ -1,4 +1,4 @@
-export const OL = {
+export var OL = {
     SERVER_URL: "ws://" + window.location.host.replace(/\d+$/, "9080"),
     username: "anonymous",
     password: "",

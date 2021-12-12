@@ -45,6 +45,7 @@ export class MainMenu extends Phaser.Scene {
                 {
                     OL.username = inputUsername.value;
                     OL.password = inputPassword.value;
+                    console.log(OL.username);
                     this.removeListener('click');
     
                     this.scene.tweens.add({ targets: element.rotate3d, x: 1, w: 90, duration: 3000, ease: 'Power3' });
@@ -78,6 +79,10 @@ export class MainMenu extends Phaser.Scene {
     clickStart(scene) {
         this.scene.start('Controls');
         this.scene.start('DigitalPlanet', {
+            spawn: {
+                x: 50,
+                y: 50
+            },
             butterflies: 3,
             mapKey: "map",
             groundTileset: {

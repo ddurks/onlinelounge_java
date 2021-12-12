@@ -1,11 +1,23 @@
 import { OL } from './utils';
 
+export const Key = {
+    'w':0,
+    'a':1,
+    's':2,
+    'd':3
+}
+
 export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture, username) {
         super(scene, x, y, texture);
 
         scene.add.existing(this);
-        scene.physics.add.existing(this);
+        let player = scene.physics.add.existing(this);
+        let drag = 700;
+        player.setDamping(false);
+        player.setDrag(drag);
+        player.body.setAllowDrag(true);
+        player.keysPressed = [0, 0, 0, 0];
 
         this.anims.create({
             key: 'down', 

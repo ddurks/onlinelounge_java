@@ -1,6 +1,6 @@
 import { OL } from './utils';
 import { GamServerClient } from './GameServerClient';
-import { Player } from './Player';
+import { Player, Key } from './Player';
 import { Butterfly, OnlineBouncer } from './Guys';
 import { Coin, Heart } from './Items';
 
@@ -15,7 +15,7 @@ export class DigitalPlanet extends Phaser.Scene {
         this.lookIndex = 0;
         this.MAX_BUTTERFLIES = 0;
         this.subscribed = false;
-        var client = new GamServerClient(OL.username, this);
+        var client = new GamServerClient(this);
         this.serverClient = client.connect(() => {});
     }
 
@@ -98,10 +98,11 @@ export class DigitalPlanet extends Phaser.Scene {
 
         console.log("logged in - " + OL.username, " (password: " + OL.password + ")");
         this.gameServer = this.generateGameServerConnectionClient();
+
+        this.serverPos = this.generateCuteGuy(this.player.x, this.player.y);
     }
 
     changeLook() {
-        console.log("changeLook");
         if (this.lookIndex < this.looks.length - 1) {
             this.lookIndex++;
         } else {
@@ -128,6 +129,7 @@ export class DigitalPlanet extends Phaser.Scene {
         }
     }
     async generateGameServerConnectionClient() {
+        this.serverClient.join(OL.username);
         this.time.addEvent({ delay: 1000/30, callback: () => {
           if (this.serverClient) {
             if (!this.subscribed) {
@@ -140,11 +142,13 @@ export class DigitalPlanet extends Phaser.Scene {
                     x: this.player.x,
                     y: this.player.y
                 },
-                velocity: this.player.body.velocity
+                velocity: this.player.body.velocity,
+                keysPressed: this.player.keysPressed
               })
             );
           }
         }, callbackScope: this, loop: true });
+        return this.serverClient;
     }
 
     subscribeToUpdates() {
@@ -183,11 +187,9 @@ export class DigitalPlanet extends Phaser.Scene {
         this.input.keyboard.enabled = true;
     }
 
-    generateCuteGuy() {
-        var cuteGuy = this.physics.add.sprite(OL.world.centerX, OL.world.centerY, 'cute');
+    generateCuteGuy(x, y) {
+        var cuteGuy = this.physics.add.sprite(x, y, 'cute');
         cuteGuy.setScale(0.25);
-        cuteGuy.setCollideWorldBounds(true);
-        cuteGuy.setBounce(1);
         return cuteGuy;
     }
 
@@ -229,7 +231,6 @@ export class DigitalPlanet extends Phaser.Scene {
         if (this.MAX_BUTTERFLIES > 0) {
             let random = OL.getRandomInt(0, 1000);
             if (random === 25) {
-                console.log("generate butterfly");
                 this.generateButterfly();
             }
             this.butterflies.forEach( (butterfly, index, butterflies) => {
@@ -245,12 +246,18 @@ export class DigitalPlanet extends Phaser.Scene {
     updateAllPlayers(playerDataList) {
         playerDataList.forEach((playerData) => {
             var playerToUpdate = this.players.get(playerData.id);
-            if (!playerToUpdate && playerData.id !== this.player.playerId) {
-                this.players.set(playerData.id, this.generatePlayer(playerData.x, playerData.y, playerData.username));
-                console.log(this.players.get(playerData.id));
-            } else if (playerToUpdate) {
-                playerToUpdate.updateFromData(playerData);
-            }
+            // if(playerData.id !== this.player.playerId) {
+                console.log(playerData.id, this.player.playerId);
+                if (!playerToUpdate && playerData.id !== this.player.playerId) {
+                    this.players.set(playerData.id, this.generatePlayer(playerData.x, playerData.y, playerData.username));
+                } else if (playerToUpdate) {
+                    playerToUpdate.updateFromData(playerData);
+                } else if (playerData.id === this.player.playerId) {
+                    this.serverPos.x = playerData.serverPosition.x;
+                    this.serverPos.y = playerData.serverPosition.y;
+                    console.log(playerData.serverPosition.x);
+                }
+            // }
         });
     }
 
@@ -283,51 +290,33 @@ export class DigitalPlanet extends Phaser.Scene {
     }
 
     playerMovementHandler() {
-        // Up-Left
-        if (this.controls.up.isDown && this.controls.left.isDown) {
+        this.player.keysPressed = [0, 0, 0, 0];
+        if (this.controls.left.isDown) {
             this.player.setVelocityX(-this.player.speed);
-            this.player.setVelocityY(-this.player.speed);
+            this.player.keysPressed[Key.a] = 1;
             this.player.anims.play('left', true);
-        // Up-Right
-        } else if (this.controls.up.isDown && this.controls.right.isDown) {
+        }
+        if (this.controls.right.isDown) {
             this.player.setVelocityX(this.player.speed);
+            this.player.keysPressed[Key.d] = 1;
+            this.player.anims.play('right', true);
+        }
+        if (this.controls.up.isDown) {
             this.player.setVelocityY(-this.player.speed);
-            this.player.anims.play('right', true);
-        // Down-Left
-        } else if (this.controls.down.isDown && this.controls.left.isDown) {
-            this.player.setVelocityX(-this.player.speed);
+            this.player.keysPressed[Key.w] = 1;
+            if (!this.controls.left.isDown && !this.controls.right.isDown) {
+                this.player.anims.play('up', true);
+            }
+        }
+        if (this.controls.down.isDown) {
             this.player.setVelocityY(this.player.speed);
-            this.player.anims.play('left', true);
-        // Down-Right
-        } else if (this.controls.down.isDown && this.controls.right.isDown) {
-            this.player.setVelocityX(this.player.speed);
-            this.player.setVelocityY(this.player.speed);
-            this.player.anims.play('right', true);
-        // Up
-        } else if (this.controls.up.isDown) {
-            this.player.setVelocityX(0);
-            this.player.setVelocityY(-this.player.speed);
-            this.player.anims.play('up', true);
-        // Down
-        } else if (this.controls.down.isDown) {
-            this.player.setVelocityX(0);
-            this.player.setVelocityY(this.player.speed);
-            this.player.anims.play('down', true);
-        // Left
-        } else if (this.controls.left.isDown) {
-            this.player.setVelocityX(-this.player.speed);
-            this.player.setVelocityY(0);
-            this.player.anims.play('left', true);
-        // Right
-        } else if (this.controls.right.isDown) {
-            this.player.setVelocityX(this.player.speed);
-            this.player.setVelocityY(0);
-            this.player.anims.play('right', true);
-        // Still
-        } else {
+            this.player.keysPressed[Key.s] = 1;
+            if (!this.controls.left.isDown && !this.controls.right.isDown) {
+                this.player.anims.play('down', true);
+            }
+        }
+        if (this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0) {
             this.player.anims.pause();
-            this.player.setVelocityX(0);
-            this.player.setVelocityY(0);
         }
     }
 
@@ -375,8 +364,6 @@ export class DigitalPlanet extends Phaser.Scene {
                 }
             }
         } else {
-            this.player.setVelocityX(0);
-            this.player.setVelocityY(0);
             this.player.anims.pause();
         }
     }
