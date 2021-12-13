@@ -7,17 +7,21 @@ export const Key = {
     'd':3
 }
 
-export class Player extends Phaser.Physics.Arcade.Sprite {
+export class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, texture, username) {
-        super(scene, x, y, texture);
+        super(scene.matter.world, x, y, texture);
 
         scene.add.existing(this);
-        let player = scene.physics.add.existing(this);
         let drag = 700;
-        player.setDamping(false);
-        player.setDrag(drag);
-        player.body.setAllowDrag(true);
-        player.keysPressed = [0, 0, 0, 0];
+        //player.setDrag(drag);
+        //player.body.setAllowDrag(true);
+        this.setBody({
+            type: 'rectangle',
+            width: 20,
+            height: 30
+        });
+        this.setFrictionAir(0.2);
+        this.keysPressed = [0, 0, 0, 0];
 
         this.anims.create({
             key: 'down', 
@@ -128,6 +132,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         } else {
             this.anims.pause();
         }
+        console.log(this.body.velocity.x);
     }
 
     updateFromData(playerData) {

@@ -42,21 +42,20 @@ export class DigitalPlanet extends Phaser.Scene {
         this.belowLayer = this.map.createLayer("below", this.groundTileset, 0, 0);
         this.worldLayer = this.map.createLayer("world", this.objectTileset, 0, 0);
         this.aboveLayer = this.map.createLayer("above", this.objectTileset, 0, 0);
-        this.worldLayer.setCollisionByProperty({ collides: true });
         this.aboveLayer.setDepth(10);
 
         this.player, this.onlineBouncer;
         if (this.startData.spawn) {
             this.player = this.generatePlayer(this.startData.spawn.x, this.startData.spawn.y, OL.username);
-            this.physics.add.collider(this.player, this.worldLayer);
-            this.physics.world.enable(this.player); 
+            //this.matter.add.collider(this.player, this.worldLayer);
+            //this.matter.world.enable(this.player); 
             this.player.playerId = this.serverClient.playerId;
         }
         this.map.findObject('player', (object) => {
             if (object.name === 'spawn' && !this.startData.spawn) {
                 this.player = this.generatePlayer(object.x, object.y, OL.username);
-                this.physics.add.collider(this.player, this.worldLayer);
-                this.physics.world.enable(this.player);
+                //this.matter.add.collider(this.player, this.worldLayer);
+                //this.matter.world.enable(this.player);
             }
 
             if (object.name === 'bouncerSpawn') {
@@ -74,6 +73,9 @@ export class DigitalPlanet extends Phaser.Scene {
                 this.worldLayer.setTileLocationCallback(object.x / object.width, object.y / object.width - 1, 1, 1, () => this.events.emit('displayPopup', {text: object.name}), this);
             }
         });
+
+        this.worldLayer.setCollisionByProperty({ collides: true });
+        this.matter.world.convertTilemapLayer(this.worldLayer);
 
         // controls
         this.controls = {
@@ -160,7 +162,9 @@ export class DigitalPlanet extends Phaser.Scene {
     }
 
     update(time, delta) {
-        this.playerHandler(delta);
+        if (this.player) {
+            this.playerHandler(delta);
+        }
         this.updateAllButterflies();
         // OL.getRandomInt(0,30) === 25 ? this.updateCoins() : this.updateHearts();
         this.cameraDolly.x = Math.floor(this.player.x);
@@ -188,7 +192,7 @@ export class DigitalPlanet extends Phaser.Scene {
     }
 
     generateCuteGuy(x, y) {
-        var cuteGuy = this.physics.add.sprite(x, y, 'cute');
+        var cuteGuy = this.matter.add.sprite(x, y, 'cute');
         cuteGuy.setScale(0.25);
         return cuteGuy;
     }
@@ -213,7 +217,8 @@ export class DigitalPlanet extends Phaser.Scene {
 
     generatePlayer(x, y, username) {
         let player = new Player(this, x, y, this.looks[this.lookIndex], username);
-        this.physics.add.collider(player, this.worldLayer);
+        player.setFixedRotation(0);
+        //this.matter.add.collider(player, this.worldLayer);
         this.events.emit('playerLoaded', {texture: player.texture.key});
         return player;
     }
@@ -291,63 +296,67 @@ export class DigitalPlanet extends Phaser.Scene {
 
     playerMovementHandler() {
         this.player.keysPressed = [0, 0, 0, 0];
-        if (this.controls.left.isDown) {
-            this.player.setVelocityX(-this.player.speed);
+        if (this.controls.left.isDown && !this.player.keysPressed[Key.a]) {
+            this.player.applyForce({x: -OL.WALKING_FORCE, y: 0});
             this.player.keysPressed[Key.a] = 1;
             this.player.anims.play('left', true);
+            return;
         }
-        if (this.controls.right.isDown) {
-            this.player.setVelocityX(this.player.speed);
+        if (this.controls.right.isDown && !this.player.keysPressed[Key.d]) {
+            console.log("right");
+            this.player.applyForce({x: OL.WALKING_FORCE, y: 0});
             this.player.keysPressed[Key.d] = 1;
             this.player.anims.play('right', true);
+            return;
         }
-        if (this.controls.up.isDown) {
-            this.player.setVelocityY(-this.player.speed);
+        if (this.controls.up.isDown && !this.player.keysPressed[Key.w]) {
+            this.player.applyForce({x: 0, y: -OL.WALKING_FORCE});
             this.player.keysPressed[Key.w] = 1;
             if (!this.controls.left.isDown && !this.controls.right.isDown) {
                 this.player.anims.play('up', true);
             }
+            return;
         }
-        if (this.controls.down.isDown) {
-            this.player.setVelocityY(this.player.speed);
+        if (this.controls.down.isDown && !this.player.keysPressed[Key.s]) {
+            this.player.applyForce({x: 0, y: OL.WALKING_FORCE});
             this.player.keysPressed[Key.s] = 1;
             if (!this.controls.left.isDown && !this.controls.right.isDown) {
                 this.player.anims.play('down', true);
             }
+            return;
         }
-        if (this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0) {
-            this.player.anims.pause();
-        }
+        this.player.anims.pause();
+        //console.log(this.player.body.velocity);
     }
 
     setPlayerSpeedFromTouchAngle(angle) {
         if (angle >= -22.5 && angle <= 22.5) { //right
-            this.player.setVelocityX(this.player.speed);
+            this.player.applyForce({x: OL.WALKING_FORCE, y: 0});
             this.player.anims.play('right', true);
         } else if (angle > 22.5 && angle <= 67.5) { //right-down
-            this.player.setVelocityX(this.player.speed);
-            this.player.setVelocityY(this.player.speed);
+            this.player.applyForce({x: OL.WALKING_FORCE, y: 0});
+            this.player.applyForce({x: 0, y: OL.WALKING_FORCE});
             this.player.anims.play('right', true);
         } else if (angle > 67.5 && angle <= 112.5) { //down
-            this.player.setVelocityY(this.player.speed);
+            this.player.applyForce({x: 0, y: OL.WALKING_FORCE});
             this.player.anims.play('down', true);
         } else if (angle > 112.5 && angle <= 157.5) { //left-down
-            this.player.setVelocityX(-this.player.speed);
-            this.player.setVelocityY(this.player.speed);
+            this.player.applyForce({x: -OL.WALKING_FORCE, y: 0});
+            this.player.applyForce({x: 0, y: OL.WALKING_FORCE});
             this.player.anims.play('left', true);
         } else if ((angle > 157.5 && angle <= 180) || (angle >= -180 && angle < -157.5) ) { //left
-            this.player.setVelocityX(-this.player.speed);
+            this.player.applyForce({x: -OL.WALKING_FORCE, y: 0});
             this.player.anims.play('left', true);
         } else if (angle >= -157.5 && angle < -112.5) { //left-up
-            this.player.setVelocityX(-this.player.speed);
-            this.player.setVelocityY(-this.player.speed);
+            this.player.applyForce({x: -OL.WALKING_FORCE, y: 0});
+            this.player.applyForce({x: 0, y: -OL.WALKING_FORCE});
             this.player.anims.play('left', true);
         } else if (angle >= -112.5 && angle < -67.5) { //up
-            this.player.setVelocityY(-this.player.speed);
+            this.player.applyForce({x: 0, y: -OL.WALKING_FORCE});
             this.player.anims.play('up', true);
         } else if (angle >= -67.5 && angle < -22.5) { //right-up
-            this.player.setVelocityX(this.player.speed);
-            this.player.setVelocityY(-this.player.speed);
+            this.player.applyForce({x: OL.WALKING_FORCE, y: 0});
+            this.player.applyForce({x: 0, y: -OL.WALKING_FORCE});
             this.player.anims.play('right', true);
         }
     }

@@ -1,6 +1,6 @@
-export class Coin extends Phaser.Physics.Arcade.Sprite {
+export class Coin extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y) {
-        super(scene, x, y, 'coin');
+        super(scene.matter.world, x, y, 'coin');
 
         scene.add.existing(this);
 
@@ -16,9 +16,9 @@ export class Coin extends Phaser.Physics.Arcade.Sprite {
     }
 }
 
-export class Heart extends Phaser.Physics.Arcade.Sprite {
+export class Heart extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y) {
-        super(scene, x, y, 'heart');
+        super(scene.matter.world, x, y, 'heart');
 
         scene.add.existing(this);
 

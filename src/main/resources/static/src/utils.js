@@ -6,8 +6,9 @@ export var OL = {
     SEND_TEXT: "send",
     MSG_MAXTIME: 10000,
     WALKING_FRAMERATE: 10,
-    WALKING_SPEED: 250,
-    IS_MOBILE: false
+    WALKING_SPEED: 2.5,
+    IS_MOBILE: false,
+    WALKING_FORCE: 0.002
 };
 
 export var touchSense = window.addEventListener('touchstart', function() {			

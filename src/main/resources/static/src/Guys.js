@@ -1,6 +1,6 @@
 import { OL } from './utils';
 
-export class Butterfly extends Phaser.Physics.Arcade.Sprite {
+export class Butterfly extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y) {
         var texture;
         switch (OL.getRandomInt(0,3)) {
@@ -17,10 +17,9 @@ export class Butterfly extends Phaser.Physics.Arcade.Sprite {
                 texture = 'blueButterfly';
                 break;
         }
-        super(scene, x, y, texture);
+        super(scene.matter.world, x, y, texture);
 
         scene.add.existing(this);
-        scene.physics.add.existing(this);
 
         this.anims.create({
             key: 'left', 
@@ -36,7 +35,7 @@ export class Butterfly extends Phaser.Physics.Arcade.Sprite {
             repeat: -1
         });
 
-        this.body.gravity.y = 100;
+        this.body.gravityScale.y = 100;
         this.homeY = y;
         OL.getRandomInt(0, 1) === 1 ? this.anims.play('left') : this.anims.play('right');
         return this;
@@ -66,20 +65,20 @@ export class Butterfly extends Phaser.Physics.Arcade.Sprite {
     }
 }
 
-export class OnlineBouncer extends Phaser.Physics.Arcade.Sprite {
+export class OnlineBouncer extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y) {
-        super(scene, x, y, 'onlineBouncer');
+        super(scene.matter.world, x, y, 'onlineBouncer');
 
-        var sprite = scene.physics.add.staticSprite(x, y, 'onlineBouncer');
+        scene.add.existing(this);
 
-        sprite.anims.create({
+        this.anims.create({
             key: 'idle', 
             frameRate: 5,
-            frames: sprite.anims.generateFrameNumbers('onlineBouncer', { frames: [0, 0, 0, 0, 2, 3] }),
+            frames: this.anims.generateFrameNumbers('onlineBouncer', { frames: [0, 0, 0, 0, 2, 3] }),
             repeat: -1
         });
 
-        sprite.anims.play('idle');
-        return sprite;
+        this.anims.play('idle');
+        return this;
     }
 }

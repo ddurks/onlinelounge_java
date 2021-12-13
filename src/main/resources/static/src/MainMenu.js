@@ -16,12 +16,11 @@ export class MainMenu extends Phaser.Scene {
             blendMode: 'ADD'
         });
 
-        var logo = this.physics.add.image(100, 100, 'logo');
+        var logo = this.matter.add.image(100, 100, 'logo');
         logo.setScale(0.25);
 
         logo.setVelocity(75, 125);
         logo.setBounce(1, 1);
-        logo.setCollideWorldBounds(true);
 
         emitter.startFollow(logo);
 

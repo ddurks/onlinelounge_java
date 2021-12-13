@@ -23,9 +23,13 @@ var gameConfig = {
 		createContainer: true
 	},	  
     physics: {
-		default: 'arcade',
-		arcade: {
-			debug: false,
+		default: 'matter',
+		matter: {
+			enableSleeping: true,
+			gravity: {
+				y: 0
+			},
+			debug: false
 		}
     },
 	scene: [Boot, Preloader, MainMenu, DigitalPlanet, Controls]
