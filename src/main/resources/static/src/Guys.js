@@ -43,15 +43,16 @@ export class Butterfly extends Phaser.Physics.Matter.Sprite {
 
     update() {
         if (this.body) {
-            let rand = OL.getRandomInt(0,50);
-            if (rand === 1) {
-                this.setVelocity(OL.getRandomInt(-100, 100), OL.getRandomInt(-300, 300));
-            } else if (rand > 43) {
-                this.setVelocity(0, 0);
-            }
-            if (this.y >= this.homeY) {
-                this.setVelocityY(OL.getRandomInt(-200, 0));
-            }
+            // let rand = OL.getRandomInt(0,50);
+            // if (rand === 1) {
+            //     this.applyForce({ x: OL.getRandomInt(-0.001, 0.001), y :OL.getRandomInt(-0.003, 0.003) });
+            // } else if (rand > 43) {
+            //     this.applyForce({x: 0, y: 0});
+            // }
+            // if (this.y >= this.homeY) {
+            //     this.applyForce({ x: 0, y :OL.getRandomInt(-0.002, 0) });
+
+            // }
             this.animForButterfly();
         }
     }
@@ -70,6 +71,8 @@ export class OnlineBouncer extends Phaser.Physics.Matter.Sprite {
         super(scene.matter.world, x, y, 'onlineBouncer');
 
         scene.add.existing(this);
+        this.setIgnoreGravity(true);
+        this.body.type = 'bouncer';
 
         this.anims.create({
             key: 'idle', 

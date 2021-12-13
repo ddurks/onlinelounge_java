@@ -47,15 +47,11 @@ export class DigitalPlanet extends Phaser.Scene {
         this.player, this.onlineBouncer;
         if (this.startData.spawn) {
             this.player = this.generatePlayer(this.startData.spawn.x, this.startData.spawn.y, OL.username);
-            //this.matter.add.collider(this.player, this.worldLayer);
-            //this.matter.world.enable(this.player); 
             this.player.playerId = this.serverClient.playerId;
         }
         this.map.findObject('player', (object) => {
             if (object.name === 'spawn' && !this.startData.spawn) {
                 this.player = this.generatePlayer(object.x, object.y, OL.username);
-                //this.matter.add.collider(this.player, this.worldLayer);
-                //this.matter.world.enable(this.player);
             }
 
             if (object.name === 'bouncerSpawn') {
@@ -76,6 +72,19 @@ export class DigitalPlanet extends Phaser.Scene {
 
         this.worldLayer.setCollisionByProperty({ collides: true });
         this.matter.world.convertTilemapLayer(this.worldLayer);
+
+        this.player.inLounge = this.startData.mapKey === 'loungeMap' ? true : false;
+        this.matter.world.on('collisionstart', (event, bodyA, bodyB) => {
+            if (bodyA.type === 'bouncer' || bodyB.type === 'bouncer') {
+                if (!this.player.inLounge) {
+                    this.player.inLounge = !this.player.inLounge;
+                    this.enterLounge();
+                } else {
+                    this.exit();
+                }
+            }
+    
+        });
 
         // controls
         this.controls = {
@@ -130,6 +139,7 @@ export class DigitalPlanet extends Phaser.Scene {
             this.scene.restart(this.exitTo);
         }
     }
+
     async generateGameServerConnectionClient() {
         this.serverClient.join(OL.username);
         this.time.addEvent({ delay: 1000/30, callback: () => {
@@ -218,7 +228,6 @@ export class DigitalPlanet extends Phaser.Scene {
     generatePlayer(x, y, username) {
         let player = new Player(this, x, y, this.looks[this.lookIndex], username);
         player.setFixedRotation(0);
-        //this.matter.add.collider(player, this.worldLayer);
         this.events.emit('playerLoaded', {texture: player.texture.key});
         return player;
     }
