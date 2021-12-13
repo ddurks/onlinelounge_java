@@ -8,22 +8,6 @@ export class MainMenu extends Phaser.Scene {
     create() {
         this.input.keyboard.on('keydown', this.handleKey, this);
 
-        var particles = this.add.particles('logo');
-
-        var emitter = particles.createEmitter({
-            speed: 100,
-            scale: { start: 0.25, end: 0 },
-            blendMode: 'ADD'
-        });
-
-        var logo = this.matter.add.image(100, 100, 'logo');
-        logo.setScale(0.25);
-
-        logo.setVelocity(75, 125);
-        logo.setBounce(1, 1);
-
-        emitter.startFollow(logo);
-
         var text = this.add.text(10, 10, 'Please login to play', { color: '#fbf236', fontFamily: 'gaming2', fontSize: '16px '});
 
         var element = this.add.dom(OL.world.width/2, OL.world.height/2).createFromCache('nameform');
@@ -46,10 +30,7 @@ export class MainMenu extends Phaser.Scene {
                     OL.password = inputPassword.value;
                     console.log(OL.username);
                     this.removeListener('click');
-    
-                    this.scene.tweens.add({ targets: element.rotate3d, x: 1, w: 90, duration: 3000, ease: 'Power3' });
-    
-                    this.scene.tweens.add({ targets: element, scaleX: 2, scaleY: 2, y: 700, duration: 3000, ease: 'Power3', onComplete: thisScene.clickStart(thisScene)});
+                    thisScene.clickStart(thisScene);
     
                     text.setText('Welcome ' + inputUsername.value);
                 }

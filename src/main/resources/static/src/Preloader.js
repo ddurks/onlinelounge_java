@@ -37,6 +37,6 @@ export class Preloader extends Phaser.Scene {
 		this.load.tilemapTiledJSON('loungeMap', 'assets/tiles/onlinelounge-tilemap.json');
     }
     create() {
-		this.scene.start('MainMenu');
+		OL.fadeOutScene('MainMenu', this);
 	}
 }
